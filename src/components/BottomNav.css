@@ -42,7 +42,7 @@
     z-index: -1;
 
     /* The Background */
-    background: linear-gradient(to right, #4b0082, #00008b);
+    background: linear-gradient(90deg, #ebdc87 0%, #e2d183 100%);
     backdrop-filter: blur(10px);
 
     /* Slanting shape with curves */
@@ -63,7 +63,7 @@
 
 /* Nav Items */
 .nav-item-custom {
-    color: rgba(255, 255, 255, 0.6);
+    color: #915200;
     font-size: 1.5rem;
 
     /* Fixed circular dimensions */
@@ -85,8 +85,8 @@
 
 /* Hover State */
 .nav-item-custom:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
+    color: #612f00;
+    background: rgba(187, 143, 0, 0.966);
     width: auto;
     /* Expand width */
     padding-right: 20px;
@@ -94,8 +94,8 @@
 
 /* Active State */
 .nav-item-custom.active {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.25);
+    color: #612f00;
+    background:  #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     /* border-radius: 50%; */

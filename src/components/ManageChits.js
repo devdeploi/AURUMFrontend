@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Button, Badge, Modal, Form, Row, Col } from 'react-bootstrap';
+import { Card, Table, Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { chits } from '../data/mockData';
 
 const ManageChits = ({ merchantId }) => {
@@ -48,7 +48,7 @@ const ManageChits = ({ merchantId }) => {
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="text-secondary mb-0"><i className="fas fa-coins me-2"></i>Manage Chit Plans</h4>
-                <Button style={{background :'linear-gradient(135deg, #00008b 0%, #4b0082 100%)',border: 'none' }} className="rounded-pill" onClick={() => openModal()}>
+                <Button style={{ background: 'linear-gradient(90deg, #ebdc87 0%, #e2d183 100%)', borderColor: '#915200', color: '#915200' }} className="fw-bold rounded-pill" onClick={() => openModal()}>
                     <i className="fas fa-plus me-2"></i>Create New Plan
                 </Button>
             </div>
@@ -75,12 +75,12 @@ const ManageChits = ({ merchantId }) => {
                             {myChits.map(chit => (
                                 <tr key={chit.id}>
                                     <td className="fw-bold">{chit.name}</td>
-                                    <td><Badge bg="info">{chit.type}</Badge></td>
+                                    <td><div className="badge" style={{ background: '#915200', color: '#fff' }}>{chit.type}</div></td>
                                     <td>₹{chit.amount}</td>
                                     <td>{chit.duration} Months</td>
                                     <td className="text-muted small text-truncate" style={{ maxWidth: '200px' }}>{chit.description}</td>
                                     <td>
-                                        <Button variant="link" className="text-primary p-0 me-3" onClick={() => openModal(chit)}>
+                                        <Button variant="link" className="p-0 me-3" style={{ color: '#915200' }} onClick={() => openModal(chit)}>
                                             <i className="fas fa-edit"></i>
                                         </Button>
                                         <Button variant="link" className="text-danger p-0" onClick={() => handleDelete(chit.id)}>
@@ -97,18 +97,18 @@ const ManageChits = ({ merchantId }) => {
             {/* Edit/Create Modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton className="border-0">
-                    <Modal.Title>{currentChit ? 'Edit Plan' : 'Create New Plan'}</Modal.Title>
+                    <Modal.Title style={{ color: '#915200' }}>{currentChit ? 'Edit Plan' : 'Create New Plan'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSaveChit}>
                         <Form.Group className="mb-3">
-                            <Form.Label>Plan Name</Form.Label>
+                            <Form.Label style={{ color: '#915200' }}>Plan Name</Form.Label>
                             <Form.Control name="name" defaultValue={currentChit?.name} required placeholder="e.g. Gold Saver" />
                         </Form.Group>
                         <Row className="g-3 mb-3">
                             <Col md={6}>
                                 <Form.Group>
-                                    <Form.Label>Type</Form.Label>
+                                    <Form.Label style={{ color: '#915200' }}>Type</Form.Label>
                                     <Form.Select name="type" defaultValue={currentChit?.type || 'Gold'}>
                                         <option value="Gold">Gold</option>
                                         <option value="Silver">Silver</option>
@@ -119,26 +119,27 @@ const ManageChits = ({ merchantId }) => {
                             </Col>
                             <Col md={6}>
                                 <Form.Group>
-                                    <Form.Label>Total Amount (₹)</Form.Label>
+                                    <Form.Label style={{ color: '#915200' }}>Total Amount (₹)</Form.Label>
                                     <Form.Control name="amount" type="number" defaultValue={currentChit?.amount} required placeholder="5000" />
                                 </Form.Group>
                             </Col>
                         </Row>
                         <Form.Group className="mb-3">
-                            <Form.Label>Duration (Months)</Form.Label>
+                            <Form.Label style={{ color: '#915200' }}>Duration (Months)</Form.Label>
                             <Form.Range
                                 name="duration"
                                 min="1" max="60"
                                 defaultValue={currentChit?.duration || 11}
                                 onChange={(e) => document.getElementById('duration-val').innerText = e.target.value + ' Months'}
                             />
-                            <div className="text-center fw-bold text-secondary" id="duration-val">{currentChit?.duration || 11} Months</div>
+                            <div className="text-center fw-bold" style={{ color: '#915200' }} id="duration-val">{currentChit?.duration || 11} Months</div>
                         </Form.Group>
                         <Form.Group className="mb-4">
-                            <Form.Label>Description / Benefits</Form.Label>
+                            <Form.Label style={{ color: '#915200' }}>Description / Benefits</Form.Label>
                             <Form.Control as="textarea" rows={3} name="description" defaultValue={currentChit?.description} placeholder="Describe the benefits..." />
                         </Form.Group>
-                        <Button style={{background :'linear-gradient(135deg, #00008b 0%, #4b0082 100%)',border: 'none' }} type="submit" className="w-100 rounded-pill">
+                        <Button
+                            style={{ background: 'linear-gradient(90deg, #ebdc87 0%, #e2d183 100%)', borderColor: '#915200', color: '#915200' }} type="submit" className="w-100 rounded-pill fw-bold">
                             Save Plan
                         </Button>
                     </Form>

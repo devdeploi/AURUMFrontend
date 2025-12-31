@@ -35,8 +35,8 @@ const Subscribers = () => {
     const revenue = (premiumCount * 5000) + (standardCount * 1500);
 
     // Custom Brand Colors
-    const brandViolet = '#8a2be2';  // Violet
-    const brandDarkBlue = '#00008b'; // Dark Blue
+    const brandViolet = '#ebdc87';  // Violet
+    const brandDarkBlue = '#915200'; // Dark Blue
 
     // Chart Data Configuration
 
@@ -138,7 +138,7 @@ const Subscribers = () => {
                                     <h5 className="fw-bold mb-0" style={{ color: brandDarkBlue }}>Revenue Trends</h5>
                                     <p className="text-muted small mb-0">First half yearly growth</p>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ color: brandViolet }}>
+                                <h2 className="fw-bold mb-0" style={{ color: brandDarkBlue }}>
                                     ₹{revenue.toLocaleString('en-IN')}
                                 </h2>
                             </div>
@@ -203,9 +203,9 @@ const Subscribers = () => {
 
                                                 className="badge badge-pillpx-3"
                                                 style={{
-                                                    backgroundColor: m.plan === 'Premium' ? '#A67C00' : 'rgba(17, 17, 190, 0.83)',
-                                                    color: m.plan === 'Premium' ? "white" : "white",
-                                                    border: `1px solid ${m.plan === 'Premium' ? "white" : "white"}`
+                                                    backgroundColor: m.plan === 'Premium' ? '#ebdc87' : '#f3e9bd',
+                                                    color: m.plan === 'Premium' ? "#915200" : "#915200",
+                                                    border: `1px solid ${m.plan === 'Premium' ? "#915200" : "#915200"}`
                                                 }}
                                             >
                                                 {m.plan}

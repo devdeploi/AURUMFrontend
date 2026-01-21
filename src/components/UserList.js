@@ -14,6 +14,27 @@ const UserList = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
+    const [userPlans, setUserPlans] = useState([]);
+
+    useEffect(() => {
+        const fetchUserPlans = async () => {
+            if (selectedUser) {
+                try {
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    const config = { headers: { Authorization: `Bearer ${user?.token}` } };
+                    const { data } = await axios.get(`${APIURL}/chit-plans/user/${selectedUser._id}`, config);
+                    setUserPlans(data);
+                } catch (error) {
+                    console.error("Error fetching user plans", error);
+                    setUserPlans([]);
+                }
+            } else {
+                setUserPlans([]);
+            }
+        };
+        fetchUserPlans();
+    }, [selectedUser]);
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -147,38 +168,115 @@ const UserList = () => {
             )}
 
             {/* User Details Modal */}
-            <Modal show={showModal} onHide={handleCloseModal} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>User Details</Modal.Title>
+            <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
+                <Modal.Header closeButton style={{ backgroundColor: '#915200', color: '#fff' }}>
+                    <Modal.Title><i className="fas fa-user-circle me-2"></i>User Details</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="bg-light">
                     {selectedUser && (
-                        <div className="text-center">
-                            <img
-                                src={`${BASEURL}${selectedUser?.profileImage?.startsWith('/') ? '' : '/'}${selectedUser?.profileImage}`}
-                                className="mb-3 border border-warning"
-                                style={{ width: '120px', height: '120px', objectFit: 'contain', borderRadius: '50%' }}
-                                alt={selectedUser.name}
-                                onError={onError}
-                            />
-                            <h4 className="fw-bold">{selectedUser.name}</h4>
-                            <p className="text-muted mb-4">{selectedUser.email}</p>
+                        <div className="row">
+                            <div className="col-md-4 text-center mb-3 mb-md-0">
+                                <div className="p-3 bg-white rounded shadow-sm h-100">
+                                    <img
+                                        src={`${BASEURL}${selectedUser?.profileImage?.startsWith('/') ? '' : '/'}${selectedUser?.profileImage}`}
+                                        className="mb-3 border border-3"
+                                        style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%', borderColor: '#915200' }}
+                                        alt={selectedUser.name}
+                                        onError={onError}
+                                    />
+                                    <h4 className="fw-bold text-dark">{selectedUser.name}</h4>
+                                    <p className="text-secondary mb-2">{selectedUser.email}</p>
+                                    <Badge bg={selectedUser.role === 'admin' ? 'danger' : selectedUser.role === 'merchant' ? 'warning' : 'info'} className="mb-3">
+                                        {selectedUser.role.toUpperCase()}
+                                    </Badge>
 
-                            <div className="text-start px-3">
-                                <div className="mb-2">
-                                    <strong>Phone:</strong> {selectedUser.phone || 'N/A'}
+                                    <div className="text-start mt-3 pt-3 border-top">
+                                        <div className="mb-2">
+                                            <i className="fas fa-phone me-2 text-secondary"></i>
+                                            {selectedUser.phone || 'N/A'}
+                                        </div>
+                                        <div className="mb-2">
+                                            <i className="fas fa-map-marker-alt me-2 text-secondary"></i>
+                                            {selectedUser.address || 'N/A'}
+                                        </div>
+                                        <div className="mb-2">
+                                            <i className="fas fa-calendar-alt me-2 text-secondary"></i>
+                                            Joined: {new Date(selectedUser.createdAt).toLocaleDateString()}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="mb-2">
-                                    <strong>Address:</strong> {selectedUser.address || 'N/A'}
+                            </div>
+
+                            <div className="col-md-8">
+                                <div className="bg-white p-3 rounded shadow-sm h-100">
+                                    <h5 className="mb-4 pb-2 border-bottom" style={{ color: '#915200' }}>
+                                        <i className="fas fa-piggy-bank me-2"></i>Subscribed Plans
+                                    </h5>
+
+                                    {userPlans.length > 0 ? (
+                                        <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '5px' }}>
+                                            {userPlans.map(plan => {
+                                                const totalAmount = plan.totalAmount || (plan.monthlyAmount * plan.durationMonths);
+                                                const balance = totalAmount - plan.totalSaved;
+                                                const progress = Math.min((plan.installmentsPaid / plan.durationMonths) * 100, 100);
+
+                                                return (
+                                                    <div key={plan._id} className="p-3 mb-3 bg-light rounded border position-relative overflow-hidden">
+                                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                                            <h6 className="fw-bold text-dark mb-0">{plan.planName}</h6>
+                                                            <div className="text-end">
+                                                                {/* <Badge bg={plan.status === 'completed' ? 'success' : 'secondary'} className="mb-1">{(plan.status).toUpperCase()}</Badge> */}
+                                                                <small className="d-block text-muted" style={{ fontSize: '0.7rem' }}>{plan.merchant?.name}</small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="row g-2 mb-2 small">
+                                                            <div className="col-4">
+                                                                <div className="text-muted">Total Goal</div>
+                                                                <div className="fw-bold">₹{totalAmount.toLocaleString()}</div>
+                                                            </div>
+                                                            <div className="col-4">
+                                                                <div className="text-muted">Saved</div>
+                                                                <div className="fw-bold text-success">₹{plan.totalSaved.toLocaleString()}</div>
+                                                            </div>
+                                                            <div className="col-4">
+                                                                <div className="text-muted">Balance</div>
+                                                                <div className="fw-bold text-danger">₹{balance.toLocaleString()}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mt-2">
+                                                            <div className="d-flex justify-content-between small mb-1">
+                                                                <span className="text-muted">Progress</span>
+                                                                <span className="fw-bold" style={{ color: '#915200' }}>{plan.installmentsPaid} / {plan.durationMonths} months</span>
+                                                            </div>
+                                                            <div className="progress" style={{ height: '8px' }}>
+                                                                <div
+                                                                    className="progress-bar"
+                                                                    role="progressbar"
+                                                                    style={{ width: `${progress}%`, backgroundColor: '#915200' }}
+                                                                    aria-valuenow={progress}
+                                                                    aria-valuemin="0"
+                                                                    aria-valuemax="100"
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-5">
+                                            <i className="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                                            <p className="text-muted small">No active subscriptions found for this user.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     )}
                 </Modal.Body>
-                <Modal.Footer >
-                    {/* <Button variant="danger" onClick={(e) => handleDeleteClick(e, selectedUser)}>
-                        Delete User
-                    </Button> */}
+                <Modal.Footer className="bg-white">
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Close
                     </Button>

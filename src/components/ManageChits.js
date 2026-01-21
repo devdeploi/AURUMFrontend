@@ -13,6 +13,7 @@ const ManageChits = () => {
     const [currentChit, setCurrentChit] = useState(null); // null = new, object = edit
     const [merchantData, setMerchantData] = useState(null); // Validated fresh merchant data
     const [upgradeCycle, setUpgradeCycle] = useState('yearly');
+    const [processing, setProcessing] = useState(false);
     const loggedinuser = JSON.parse(localStorage.getItem('user'));
     const merchantId = loggedinuser._id;
 
@@ -73,6 +74,7 @@ const ManageChits = () => {
             return;
         }
 
+        setProcessing(true);
         try {
             const config = getAuthConfig();
             if (currentChit) {
@@ -88,11 +90,14 @@ const ManageChits = () => {
         } catch (error) {
             console.error("Error saving chit plan", error);
             alert("Failed to save plan. Please try again.");
+        } finally {
+            setProcessing(false);
         }
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this plan?")) {
+            setProcessing(true);
             try {
                 const config = getAuthConfig();
                 await axios.delete(`${APIURL}/chit-plans/${id}`, config);
@@ -100,6 +105,8 @@ const ManageChits = () => {
             } catch (error) {
                 console.error("Error deleting chit plan", error);
                 alert("Failed to delete plan.");
+            } finally {
+                setProcessing(false);
             }
         }
     };
@@ -149,7 +156,7 @@ const ManageChits = () => {
 
             // 2. Initialize Razorpay
             const options = {
-                key: "rzp_test_S0aFMLxRqwkL8z", // Replace with your actual Key ID
+                key: "rzp_test_S6RoMCiZCpsLo7", // Replace with your actual Key ID
                 amount: order.amount,
                 currency: order.currency,
                 name: "Aurum Jewellery",
@@ -455,7 +462,19 @@ const ManageChits = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </div>
+
+
+            {/* Processing Overlay Modal */}
+            < Modal show={processing} centered backdrop="static" keyboard={false} size="sm" >
+                <Modal.Body className="text-center p-4">
+                    <div className="spinner-border mb-3" role="status" style={{ color: '#915200' }}>
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 className="fw-bold" style={{ color: '#915200' }}>Please Wait</h5>
+                    <p className="text-muted mb-0 small">Processing request and sending notifications...</p>
+                </Modal.Body>
+            </Modal >
+        </div >
     );
 };
 

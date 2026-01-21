@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Badge, Modal, Button, Row, Col, Card, Pagination } from 'react-bootstrap';
+import { Table, Badge, Modal, Button, Row, Col, Pagination } from 'react-bootstrap';
 // import { merchants, chits } from '../data/mockData'; // Removed mock data import
 import axios from 'axios';
 import { APIURL } from '../utils/Function';
@@ -294,68 +294,73 @@ const MerchantList = ({ mode = 'admin' }) => {
             )}
 
             {/* Merchant Details Modal */}
-            <Modal show={showModal} onHide={handleClose} size="lg" centered scrollable>
-                {selectedMerchant && (
-                    <>
-                        <Modal.Header className="border-0 pb-0" closeButton>
-                            <Modal.Title className="fw-bold" style={{ color: '#915200' }}>
-                                <i className="fas fa-store me-2"></i>
-                                {selectedMerchant.name}
-                            </Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body className="p-4">
-                            {/* Images Gallery */}
-                            {selectedMerchant.shopImages && selectedMerchant.shopImages.length > 0 && (
-                                <div className="d-flex gap-2 mb-4 overflow-auto">
-                                    {selectedMerchant.shopImages.map((img, i) => (
-                                        <img key={i} src={`${APIURL.replace('/api', '')}${img}`} alt="Shop" style={{ height: 150, borderRadius: 8 }} />
-                                    ))}
-                                </div>
-                            )}
+            <Modal show={showModal} onHide={handleClose} size="lg" centered>
+                <Modal.Header closeButton style={{ backgroundColor: '#915200', color: '#fff' }}>
+                    <Modal.Title><i className="fas fa-store me-2"></i>Merchant Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="bg-light">
+                    {selectedMerchant && (
+                        <Row>
+                            {/* Left Column: Details */}
+                            <Col md={4} className="mb-3 mb-md-0">
+                                <div className="p-3 bg-white rounded shadow-sm h-100">
+                                    <div className="text-center">
+                                        {selectedMerchant.shopImages && selectedMerchant.shopImages.length > 0 ? (
+                                            <img
+                                                src={`${APIURL.replace('/api', '')}${selectedMerchant.shopImages[0]}`}
+                                                alt="Shop"
+                                                className="mb-3 border border-3"
+                                                style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%', borderColor: '#915200' }}
+                                            />
+                                        ) : (
+                                            <div className="mb-3 d-inline-flex align-items-center justify-content-center bg-light border border-3" style={{ width: '120px', height: '120px', borderRadius: '50%', borderColor: '#915200' }}>
+                                                <i className="fas fa-store fa-3x text-secondary"></i>
+                                            </div>
+                                        )}
+                                        <h5 className="fw-bold text-dark">{selectedMerchant.name}</h5>
+                                        <p className="text-secondary mb-2 small">{selectedMerchant.email}</p>
 
-                            {/* Profile Details */}
-                            <Row className="mb-4">
-                                <Col md={6}>
-                                    <h6 className="text-secondary text-uppercase small fw-bold">Contact Info</h6>
-                                    <p className="mb-1"><strong>Email:</strong> {selectedMerchant.email}</p>
-                                    <p className="mb-1"><strong>Phone:</strong> {selectedMerchant.phone || 'N/A'}</p>
-                                    <p className="mb-1"><strong>Address:</strong> {selectedMerchant.address || 'N/A'}</p>
-                                    {/* Don't show PayPal for public maybe? Safe to show if users need to pay? Actually users pay via App flow usually, better hide PayPal email from public view to avoid spam */}
-                                    {/* {mode !== 'public' && <p className="mb-0"><strong>PayPal:</strong> {selectedMerchant.paypalEmail || 'N/A'}</p>} */}
-                                </Col>
-                                <Col md={6}>
-                                    <h6 className="text-secondary text-uppercase small fw-bold">Account Details</h6>
-                                    <p className="mb-1"><strong>Plan:</strong> {selectedMerchant.plan} <span className="text-muted small text-capitalize">({selectedMerchant.billingCycle || 'monthly'})</span></p>
-                                    <p className="mb-1"><strong>Subscription:</strong>
-                                        {selectedMerchant.subscriptionExpiryDate ?
-                                            <span className="ms-1">
-                                                {new Date(selectedMerchant.subscriptionExpiryDate).toLocaleDateString()}
-                                                {new Date(selectedMerchant.subscriptionExpiryDate) < new Date() && <Badge bg="danger" className="ms-2">Expired</Badge>}
-                                            </span> : ' N/A'}
-                                    </p>
-                                    {selectedMerchant.upcomingPlan && (
-                                        <p className="mb-1 text-info small">
-                                            <strong>Upcoming:</strong> {selectedMerchant.upcomingPlan} (from {new Date(selectedMerchant.planSwitchDate).toLocaleDateString()})
-                                        </p>
-                                    )}
-                                    {mode !== 'public' && <p className="mb-1"><strong>Status:</strong> <span className={`text-${selectedMerchant.status === 'Approved' ? 'success' : 'warning'}`}>{selectedMerchant.status}</span></p>}
-                                    <p className="mb-0"><strong>Joined:</strong> {new Date(selectedMerchant.createdAt).toLocaleDateString()}</p>
-                                </Col>
-                                <Col md={12} className="mt-3">
-                                    <h6 className="text-secondary text-uppercase small fw-bold">GSTIN & Verification</h6>
-                                    <p className="mb-1"><strong>GSTIN:</strong> {selectedMerchant.gstin || 'N/A'}</p>
-                                    {selectedMerchant.addressProof ? (
-                                        <div className="mt-2">
-                                            <p className="mb-1 fw-bold small">Address Proof:</p>
-                                            <div className="d-flex align-items-center gap-3">
-                                                <img
-                                                    src={`${APIURL.replace('/api', '')}${selectedMerchant.addressProof}`}
-                                                    alt="Address Proof"
-                                                    style={{ height: 80, borderRadius: 6, border: '1px solid #dee2e6' }}
-                                                />
+                                        <div className="mb-3">
+                                            <span className={`badge-custom ${selectedMerchant.plan === 'Premium' ? 'badge-premium' : 'badge-standard'} me-2`}>
+                                                {selectedMerchant.plan}
+                                            </span>
+                                            {mode !== 'public' && (
+                                                <Badge bg={selectedMerchant.status === 'Approved' ? 'success' : selectedMerchant.status === 'Rejected' ? 'danger' : 'warning'}>
+                                                    {selectedMerchant.status}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="text-start mt-3 pt-3 border-top small">
+                                        <div className="mb-2"><strong>Phone:</strong> {selectedMerchant.phone || 'N/A'}</div>
+                                        <div className="mb-2"><strong>Address:</strong> {selectedMerchant.address || 'N/A'}</div>
+                                        <div className="mb-2"><strong>Joined:</strong> {new Date(selectedMerchant.createdAt).toLocaleDateString()}</div>
+
+                                        <hr className="my-2" />
+
+                                        <p className="mb-1 fw-bold text-dark">Subscription:</p>
+                                        <div className="mb-2">
+                                            {selectedMerchant.subscriptionExpiryDate ? (
+                                                <>
+                                                    {new Date(selectedMerchant.subscriptionExpiryDate).toLocaleDateString()}
+                                                    {new Date(selectedMerchant.subscriptionExpiryDate) < new Date() && <Badge bg="danger" className="ms-1">Expired</Badge>}
+                                                </>
+                                            ) : 'N/A'}
+                                        </div>
+
+                                        <hr className="my-2" />
+
+                                        <p className="mb-1 fw-bold text-dark">GSTIN:</p>
+                                        <div className="mb-2">{selectedMerchant.gstin || 'N/A'}</div>
+
+                                        {selectedMerchant.addressProof && (
+                                            <div className="mt-2">
+                                                <p className="mb-1 fw-bold">Address Proof:</p>
                                                 <Button
-                                                    variant="outline-dark"
+                                                    variant="outline-secondary"
                                                     size="sm"
+                                                    className="w-100"
                                                     onClick={() => handleDownload(
                                                         `${APIURL.replace('/api', '')}${selectedMerchant.addressProof}`,
                                                         `AddressProof_${selectedMerchant.name.replace(/\s+/g, '_')}.jpg`
@@ -364,66 +369,70 @@ const MerchantList = ({ mode = 'admin' }) => {
                                                     <i className="fas fa-download me-1"></i> Download
                                                 </Button>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <p className="text-muted small">No address proof uploaded.</p>
-                                    )}
-                                </Col>
-                            </Row>
+                                        )}
+                                    </div>
+                                </div>
+                            </Col>
 
-                            <hr className="text-muted opacity-25" />
+                            {/* Right Column: Key Metrics & Chits */}
+                            <Col md={8}>
+                                <div className="bg-white p-3 rounded shadow-sm h-100">
+                                    <h5 className="mb-3 pb-2 border-bottom" style={{ color: '#915200' }}>
+                                        <i className="fas fa-file-invoice-dollar me-2"></i>Active Chit Plans
+                                    </h5>
 
-                            {/* Chit Plans List */}
-                            <h5 className="mb-3" style={{ color: '#915200' }}>
-                                <i className="fas fa-file-invoice-dollar me-2"></i>
-                                Active Chit Plans
-                            </h5>
-
-                            {merchantChits.length > 0 ? (
-                                <Row className="g-3">
-                                    {merchantChits.map(chit => (
-                                        <Col md={12} key={chit._id}>
-                                            <Card className="h-100 border-0 shadow-sm" style={{ backgroundColor: '#e5e5e5' }}>
-                                                <Card.Body>
-                                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                                        <h6 className="fw-bold mb-0 text-dark">{chit.planName}</h6>
+                                    {merchantChits.length > 0 ? (
+                                        <div style={{ maxHeight: '500px', overflowY: 'auto', paddingRight: '5px' }}>
+                                            {merchantChits.map(chit => (
+                                                <div key={chit._id} className="p-3 mb-3 bg-light rounded border position-relative">
+                                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                                        <h6 className="fw-bold text-dark mb-0">{chit.planName}</h6>
+                                                        <Badge bg="secondary" className="text-white">
+                                                            {chit.subscribers ? chit.subscribers.length : 0} Subscribers
+                                                        </Badge>
                                                     </div>
                                                     <p className="small text-muted mb-2">{chit.description}</p>
-                                                    <div className="d-flex justify-content-between small">
-                                                        <span><strong>Amount:</strong> ₹{chit.monthlyAmount}/mo</span>
-                                                        <span><strong>Duration:</strong> {chit.durationMonths} months</span>
-                                                    </div>
-                                                </Card.Body>
-                                            </Card>
-                                        </Col>
-                                    ))}
-                                </Row>
-                            ) : (
-                                <div className="text-center py-4 bg-light rounded">
-                                    <p className="text-muted mb-0">No active chit plans found for this merchant.</p>
-                                </div>
-                            )}
 
-                        </Modal.Body>
-                        <Modal.Footer className="border-0 pt-0">
-                            {mode !== 'public' && (
+                                                    <div className="row g-2 small">
+                                                        <div className="col-6">
+                                                            <div className="text-muted">Monthly</div>
+                                                            <div className="fw-bold">₹{chit.monthlyAmount}</div>
+                                                        </div>
+                                                        <div className="col-6">
+                                                            <div className="text-muted">Duration</div>
+                                                            <div className="fw-bold">{chit.durationMonths} Months</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-5">
+                                            <i className="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                                            <p className="text-muted small">No active chit plans found.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </Col>
+                        </Row>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="bg-white">
+                    {mode !== 'public' && selectedMerchant && (
+                        <>
+                            {selectedMerchant.status === 'Pending' && (
                                 <>
-                                    {selectedMerchant.status === 'Pending' && (
-                                        <>
-                                            <Button style={{ backgroundColor: '#915200', borderColor: '#915200', color: 'white' }} onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Approve'); }}>Approve</Button>
-                                            <Button style={{ backgroundColor: '#915200', borderColor: '#915200', color: 'white' }} onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Reject'); }}>Reject</Button>
-                                        </>
-                                    )}
-                                    {selectedMerchant.status === 'Approved' && (
-                                        <Button style={{ backgroundColor: '#915200', borderColor: '#915200', color: 'white' }} onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Reject'); }}>Reject</Button>
-                                    )}
-                                    {/* <Button variant="danger" onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Delete'); }}>Delete</Button> */}
+                                    <Button style={{ backgroundColor: '#915200', borderColor: '#915200', color: 'white' }} onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Approve'); }}>Approve</Button>
+                                    <Button style={{ backgroundColor: '#915200', borderColor: '#915200', color: 'white' }} onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Reject'); }}>Reject</Button>
                                 </>
                             )}
-                            <Button variant="secondary" onClick={handleClose}>Close</Button>
-                        </Modal.Footer>
-                    </>
-                )}
+                            {selectedMerchant.status === 'Approved' && (
+                                <Button style={{ backgroundColor: '#915200', borderColor: '#915200', color: 'white' }} onClick={() => { handleClose(); triggerAction(selectedMerchant, 'Reject'); }}>Reject</Button>
+                            )}
+                        </>
+                    )}
+                    <Button variant="secondary" onClick={handleClose}>Close</Button>
+                </Modal.Footer>
             </Modal>
 
             {/* Confirmation Modal */}

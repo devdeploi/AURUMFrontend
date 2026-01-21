@@ -79,3 +79,16 @@ body {
 .transform-hover:hover {
   transform: translateY(-5px);
 }
+
+/* Brand Button Styles */
+.btn-outline-brand {
+  color: #915200 !important;
+  border-color: #915200 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-brand:hover {
+  color: #fff !important;
+  background-color: #915200 !important;
+  border-color: #915200 !important;
+}

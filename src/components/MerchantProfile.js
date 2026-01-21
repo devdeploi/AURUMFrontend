@@ -322,7 +322,7 @@ const MerchantProfile = ({ merchantData }) => {
             const user = JSON.parse(localStorage.getItem('user'));
 
             const options = {
-                key: order.keyId || process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_S0aFMLxRqwkL8z", // keyId might come from create-renewal-order response
+                key: order.keyId || process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_S6RoMCiZCpsLo7", // keyId might come from create-renewal-order response
                 amount: order.order.amount,
                 currency: order.order.currency,
                 name: "Aurum Jewellery",

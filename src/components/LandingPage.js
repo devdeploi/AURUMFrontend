@@ -6,6 +6,7 @@ const LandingPage = () => {
     const navigate = useNavigate();
     const [scrolled, setScrolled] = useState(false);
     const [showOffcanvas, setShowOffcanvas] = useState(false);
+    const [billingCycle, setBillingCycle] = useState('monthly');
 
     const handleClose = () => setShowOffcanvas(false);
     const handleShow = () => setShowOffcanvas(true);
@@ -51,17 +52,19 @@ const LandingPage = () => {
     const plans = [
         {
             name: 'Standard',
-            price: '₹1500',
-            period: '/mo',
+            price: billingCycle === 'yearly' ? '₹15,000' : '₹1500',
+            period: billingCycle === 'yearly' ? '/yr' : '/mo',
             features: ['Manage up to 3 chits', 'Basic Analytics', 'Email Support'],
-            recommended: false
+            recommended: false,
+            savings: billingCycle === 'yearly' ? 'Save ₹3,000/yr' : ''
         },
         {
             name: 'Premium',
-            price: '₹5000',
-            period: '/mo',
+            price: billingCycle === 'yearly' ? '₹50,000' : '₹5000',
+            period: billingCycle === 'yearly' ? '/yr' : '/mo',
             features: ['Manage up to 6 chits', 'Advanced Analytics', 'Priority 24/7 Support'],
-            recommended: true
+            recommended: true,
+            savings: billingCycle === 'yearly' ? 'Save ₹10,000/yr' : ''
         }
     ];
 
@@ -752,7 +755,7 @@ const LandingPage = () => {
                                 color: brandColor,
                                 letterSpacing: '2px'
                             }}>
-                                <i className="fas fa-users me-2"></i>for Users
+                                <i className="fas fa-users me-2"></i>User Journey
                             </span>
                         </div>
                         <h2 className="fw-bold display-5 mb-3">How Users Join & Payment Flow</h2>
@@ -885,9 +888,28 @@ const LandingPage = () => {
                             </span>
                         </div>
                         <h2 className="fw-bold display-5 mb-3 text-dark">Choose the plan that fits you</h2>
-                        <p className="text-muted lead mx-auto" style={{ maxWidth: '600px' }}>
+                        <p className="text-muted lead mx-auto mb-4" style={{ maxWidth: '600px' }}>
                             Simple, transparent pricing to help you grow your jewellery business.
                         </p>
+
+                        {/* Billing Cycle Toggle */}
+                        <div className="d-flex justify-content-center align-items-center gap-3">
+                            <span className={`fw-bold ${billingCycle === 'monthly' ? 'text-dark' : 'text-muted'}`}>Monthly</span>
+                            <div className="form-check form-switch custom-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    id="billingSwitch"
+                                    checked={billingCycle === 'yearly'}
+                                    onChange={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
+                                    style={{ width: '3em', height: '1.5em', cursor: 'pointer', backgroundColor: billingCycle === 'yearly' ? brandColor : '#ddd', borderColor: 'transparent' }}
+                                />
+                            </div>
+                            <span className={`fw-bold ${billingCycle === 'yearly' ? 'text-dark' : 'text-muted'}`}>
+                                Yearly <span className="badge bg-success ms-1 small">Save up to 17%</span>
+                            </span>
+                        </div>
                     </div>
 
                     <Row className="justify-content-center g-4">
@@ -943,9 +965,16 @@ const LandingPage = () => {
                                                 <i className={`fas ${plan.recommended ? 'fa-crown' : 'fa-cube'} fs-4`}></i>
                                             </div>
                                             <h4 className="fw-bold mb-2">{plan.name}</h4>
-                                            <div className="d-flex align-items-center justify-content-center">
-                                                <span className="h1 fw-bold mb-0" style={{ color: '#2c3e50' }}>{plan.price}</span>
-                                                <span className="text-muted ms-1 align-self-end mb-2">{plan.period}</span>
+                                            <div className="d-flex align-items-center justify-content-center flex-column">
+                                                <div>
+                                                    <span className="h1 fw-bold mb-0" style={{ color: '#2c3e50' }}>{plan.price}</span>
+                                                    <span className="text-muted ms-1 align-self-end mb-2">{plan.period}</span>
+                                                </div>
+                                                {plan.savings && (
+                                                    <span className="badge bg-success bg-opacity-10 text-success mt-2 px-3 py-1 rounded-pill">
+                                                        {plan.savings}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 

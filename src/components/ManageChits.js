@@ -12,6 +12,7 @@ const ManageChits = () => {
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [currentChit, setCurrentChit] = useState(null); // null = new, object = edit
     const [merchantData, setMerchantData] = useState(null); // Validated fresh merchant data
+    const [upgradeCycle, setUpgradeCycle] = useState('yearly');
     const loggedinuser = JSON.parse(localStorage.getItem('user'));
     const merchantId = loggedinuser._id;
 
@@ -141,8 +142,9 @@ const ManageChits = () => {
         setShowUpgradeModal(false); // Close modal before starting payment logic
         try {
             // 1. Create Order
+            const amount = upgradeCycle === 'yearly' ? 50000 : 5000;
             const { data: order } = await axios.post(`${APIURL}/payments/create-subscription-order`, {
-                amount: 5000
+                amount: amount
             });
 
             // 2. Initialize Razorpay
@@ -172,6 +174,7 @@ const ManageChits = () => {
                             const updatePayload = {
                                 ...currentMerchant,
                                 plan: 'Premium',
+                                billingCycle: upgradeCycle,
                                 paymentId: response.razorpay_payment_id
                             };
 
@@ -230,7 +233,20 @@ const ManageChits = () => {
                                 border: '1px solid rgba(145, 82, 0, 0.3)',
                             }}
                         >
-                            {userPlan} Plan
+                            {userPlan} Plan <span className="small text-capitalize">({merchantData?.billingCycle || 'monthly'})</span>
+                        </div>
+                        <div className="d-flex flex-column ms-2">
+                            {merchantData?.subscriptionExpiryDate && (
+                                <small className="text-muted fw-bold" style={{ fontSize: '0.75rem' }}>
+                                    Expires: {new Date(merchantData.subscriptionExpiryDate).toLocaleDateString()}
+                                </small>
+                            )}
+                            {merchantData?.upcomingPlan && (
+                                <small className="text-info fw-bold" style={{ fontSize: '0.7rem' }}>
+                                    <i className="fas fa-info-circle me-1"></i>
+                                    {userPlan} active until expiry, then {merchantData.upcomingPlan}
+                                </small>
+                            )}
                         </div>
 
 
@@ -406,7 +422,28 @@ const ManageChits = () => {
                         <h4 className="fw-bold">Unlock Unlimited Possibilities</h4>
                         <p className="text-muted">Upgrade to the Premium plan to create unlimited chit plans and grow your business without limits.</p>
                         <hr />
-                        <div className="display-6 fw-bold text-success">₹5000<span className="fs-6 text-muted">/year</span></div>
+                        <div className="d-flex justify-content-center gap-2 mb-3 mt-4">
+                            <Button
+                                variant={upgradeCycle === 'monthly' ? 'warning' : 'outline-secondary'}
+                                size="sm"
+                                className="fw-bold rounded-pill"
+                                onClick={() => setUpgradeCycle('monthly')}
+                            >
+                                Monthly
+                            </Button>
+                            <Button
+                                variant={upgradeCycle === 'yearly' ? 'warning' : 'outline-secondary'}
+                                size="sm"
+                                className="fw-bold rounded-pill"
+                                onClick={() => setUpgradeCycle('yearly')}
+                            >
+                                Yearly (Save ₹10,000)
+                            </Button>
+                        </div>
+                        <div className="display-6 fw-bold text-success">
+                            {upgradeCycle === 'yearly' ? '₹50,000' : '₹5,000'}
+                            <span className="fs-6 text-muted">/{upgradeCycle === 'yearly' ? 'year' : 'month'}</span>
+                        </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer className="border-0 justify-content-center pb-4">

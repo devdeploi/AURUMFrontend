@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { Form, Button, Row, Col, Card, Spinner, Badge } from 'react-bootstrap';
 
@@ -10,6 +11,7 @@ const MerchantProfile = ({ merchantData }) => {
     const { Razorpay } = useRazorpay();
     const [data, setData] = useState(merchantData);
     const [isEditing, setIsEditing] = useState(false);
+    const [merchantUpgradeCycle, setMerchantUpgradeCycle] = useState('yearly');
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
     // Verification States
@@ -194,8 +196,9 @@ const MerchantProfile = ({ merchantData }) => {
     const handleUpgradePayment = async () => {
         try {
             // 1. Create Order
+            const amount = merchantUpgradeCycle === 'yearly' ? 50000 : 5000;
             const { data: order } = await axios.post(`${APIURL}/payments/create-subscription-order`, {
-                amount: 5000 // Premium Plan Price
+                amount: amount // Premium Plan Price
             });
 
             // 2. Initialize Razorpay
@@ -254,7 +257,7 @@ const MerchantProfile = ({ merchantData }) => {
             const config = { headers: { Authorization: `Bearer ${user?.token}` } };
 
             // Update plan to Premium
-            const updatePayload = { ...data, plan: 'Premium', paymentId }; // optionally save paymentId
+            const updatePayload = { ...data, plan: 'Premium', billingCycle: merchantUpgradeCycle, paymentId };
             const { data: updatedMerchant } = await axios.put(`${APIURL}/merchants/${data._id}`, updatePayload, config);
             console.log(updatedMerchant);
 
@@ -443,13 +446,8 @@ const MerchantProfile = ({ merchantData }) => {
                                     name="phone"
                                     value={data.phone}
                                     onChange={handleChange}
-                                    disabled={!isEditing}
-                                    className={`rounded-3 ${!isEditing ? "" : "bg-white shadow-sm"} fw-bold`}
-                                    style={{
-                                        transition: 'all 0.3s ease',
-                                        border: isEditing ? '1px solid #915200' : '',
-                                        // color: '#915200'
-                                    }}
+                                    disabled
+                                    className='fw-bold'
                                 />
                             </Form.Group>
                         </Col>
@@ -762,10 +760,25 @@ const MerchantProfile = ({ merchantData }) => {
                                             </div>
                                         )}
                                     </div>
+                                    <div className="small text-muted mt-2">
+                                        <i className="fas fa-calendar-alt me-1"></i>
+                                        <span className="fw-bold text-capitalize">{data.billingCycle || 'Monthly'}</span> Plan
+                                        {data.subscriptionExpiryDate && (
+                                            <span className="ms-2">
+                                                • Expires: {new Date(data.subscriptionExpiryDate).toLocaleDateString()}
+                                            </span>
+                                        )}
+                                        {data.upcomingPlan && (
+                                            <div className="text-info mt-1 fw-bold">
+                                                <i className="fas fa-info-circle me-1"></i>
+                                                {data.plan} active until expiry, then {data.upcomingPlan}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="d-flex align-items-center gap-2">
-                                    {data.plan === 'Premium' && (
+                                    {/* {data.plan === 'Premium' && (
                                         <Button
                                             variant="outline-secondary"
                                             className="fw-bold rounded-pill px-3"
@@ -773,7 +786,7 @@ const MerchantProfile = ({ merchantData }) => {
                                         >
                                             <i className="fas fa-arrow-down me-2"></i> Downgrade
                                         </Button>
-                                    )}
+                                    )} */}
                                     {data.plan !== 'Premium' && (
                                         <Button
                                             style={{
@@ -826,7 +839,28 @@ const MerchantProfile = ({ merchantData }) => {
                                     <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Priority Support</li>
                                 </ul>
                                 <hr />
-                                <div className="display-6 fw-bold text-success">₹5000<span className="fs-6 text-muted">/year</span></div>
+                                <div className="d-flex justify-content-center gap-2 mb-3 mt-4">
+                                    <Button
+                                        variant={merchantUpgradeCycle === 'monthly' ? 'warning' : 'outline-secondary'}
+                                        size="sm"
+                                        className="fw-bold rounded-pill"
+                                        onClick={() => setMerchantUpgradeCycle('monthly')}
+                                    >
+                                        Monthly
+                                    </Button>
+                                    <Button
+                                        variant={merchantUpgradeCycle === 'yearly' ? 'warning' : 'outline-secondary'}
+                                        size="sm"
+                                        className="fw-bold rounded-pill"
+                                        onClick={() => setMerchantUpgradeCycle('yearly')}
+                                    >
+                                        Yearly (Save ₹10,000)
+                                    </Button>
+                                </div>
+                                <div className="display-6 fw-bold text-success">
+                                    {merchantUpgradeCycle === 'yearly' ? '₹50,000' : '₹5,000'}
+                                    <span className="fs-6 text-muted">/{merchantUpgradeCycle === 'yearly' ? 'year' : 'month'}</span>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer border-0 justify-content-center pb-4">

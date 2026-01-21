@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Card, InputGroup, ProgressBar, Alert, Nav } from 'react-bootstrap';
 import OtpInput from 'react-otp-input';
 import './Login.css';
@@ -27,7 +27,31 @@ const Login = ({ onLogin, onRegisterClick }) => {
     const [resetError, setResetError] = useState('');
     const [passwordStrength, setPasswordStrength] = useState(0);
 
+
+
     const [isLoading, setIsLoading] = useState(false);
+    const [resendTimer, setResendTimer] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if ((/android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent)) && !window.MSStream) {
+                setIsMobile(true);
+            }
+        };
+        checkMobile();
+    }, []);
+
+    useEffect(() => {
+        let interval;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [resendTimer]);
 
     // Merchant Login OTP State
     const [merchantLoginStep, setMerchantLoginStep] = useState(1);
@@ -95,6 +119,7 @@ const Login = ({ onLogin, onRegisterClick }) => {
         try {
             await axios.post(`${APIURL}/merchants/send-login-otp`, { email });
             setMerchantLoginStep(2); // Move to OTP entry
+            setResendTimer(60);
         } catch (error) {
             console.error(error);
             setError(error.response?.data?.message || 'Failed to send OTP. Check if email is registered.');
@@ -130,6 +155,7 @@ const Login = ({ onLogin, onRegisterClick }) => {
             try {
                 await axios.post(`${APIURL}/forgot-password`, { email: resetEmail });
                 setResetStep(2);
+                setResendTimer(60);
                 setResetError('');
                 setResetMessage(`OTP sent to ${resetEmail}`);
                 setTimeout(() => setResetMessage(''), 3000);
@@ -187,6 +213,46 @@ const Login = ({ onLogin, onRegisterClick }) => {
             else setResetError('An error occurred.');
         }
     };
+
+    if (isMobile) {
+        return (
+            <div className="d-flex align-items-center justify-content-center vh-100 bg-white">
+                <div className="text-center p-4">
+                    <img src="/images/AURUM.png" alt="Aurum" height="80" className="mb-4" />
+                    <h3 className="fw-bold mb-3" style={{ color: '#915200' }}>Download Our Mobile App</h3>
+                    <p className="text-muted mb-4 lead" style={{ maxWidth: '350px', margin: '0 auto', fontSize: '1rem' }}>
+                        For the best security and experience, please use our mobile app to login.
+                    </p>
+
+                    <div className="d-flex flex-column gap-3 justify-content-center align-items-center">
+                        <Button
+                            href="#"
+                            className="d-flex align-items-center justify-content-center gap-2 px-4 py-3 rounded-pill fw-bold border-0 shadow-sm hover-scale"
+                            style={{ backgroundColor: '#915200', minWidth: '240px', transition: 'all 0.3s' }}
+                        >
+                            <i className="fab fa-android fa-lg"></i> Download for Android
+                        </Button>
+                        <Button
+                            href="#"
+                            variant="light"
+                            className="d-flex align-items-center justify-content-center gap-2 px-4 py-3 rounded-pill fw-bold border shadow-sm hover-scale"
+                            style={{ minWidth: '240px', color: '#915200', borderColor: '#915200', transition: 'all 0.3s' }}
+                        >
+                            <i className="fab fa-apple fa-lg"></i> Download for iOS
+                        </Button>
+                    </div>
+
+                    <div className="mt-5 text-muted small">
+                        <p className="mb-1">Already have the app?</p>
+                        <p className="fw-bold" style={{ color: '#915200' }}>Open it to login.</p>
+                    </div>
+                </div>
+                <style>{`
+                    .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+                `}</style>
+            </div>
+        );
+    }
 
     return (
         <div className="login-container shadow-lg">
@@ -283,6 +349,20 @@ const Login = ({ onLogin, onRegisterClick }) => {
                                 <Button variant="primary" type="submit" className="w-100 mb-3">
                                     Verify OTP
                                 </Button>
+                                <div className="text-center mb-3">
+                                    <span className="text-muted small">Didn't receive code? </span>
+                                    <span
+                                        className="fw-bold"
+                                        style={{
+                                            cursor: resendTimer > 0 ? 'not-allowed' : 'pointer',
+                                            color: resendTimer > 0 ? '#6c757d' : '#915200',
+                                            textDecoration: resendTimer > 0 ? 'none' : 'underline'
+                                        }}
+                                        onClick={resendTimer > 0 ? null : handleSendResetOtp}
+                                    >
+                                        {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
+                                    </span>
+                                </div>
                             </Form>
                         )}
 
@@ -394,8 +474,8 @@ const Login = ({ onLogin, onRegisterClick }) => {
                                 )}
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Control
-                                        type="email"
-                                        placeholder="Enter email"
+                                        type="text"
+                                        placeholder="Enter email or phone"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -444,16 +524,7 @@ const Login = ({ onLogin, onRegisterClick }) => {
                                     </div>
                                 )}
 
-                                <div className="text-center mt-3">
-                                    <span style={{ color: "#915200" }}>New Merchant? </span>
-                                    <span
-                                        className="fw-bold"
-                                        style={{ cursor: 'pointer', textDecoration: 'underline', color: "#915200" }}
-                                        onClick={onRegisterClick}
-                                    >
-                                        Register Here
-                                    </span>
-                                </div>
+
                             </Form>
                         ) : (
                             <Form onSubmit={handleMerchantVerifyOtp}>
@@ -504,6 +575,20 @@ const Login = ({ onLogin, onRegisterClick }) => {
                                         'Verify & Login'
                                     )}
                                 </Button>
+                                <div className="text-center mb-3">
+                                    <span className="text-muted small">Didn't receive code? </span>
+                                    <span
+                                        className="fw-bold"
+                                        style={{
+                                            cursor: resendTimer > 0 ? 'not-allowed' : 'pointer',
+                                            color: resendTimer > 0 ? '#6c757d' : '#915200',
+                                            textDecoration: resendTimer > 0 ? 'none' : 'underline'
+                                        }}
+                                        onClick={resendTimer > 0 ? null : handleSendLoginOtp}
+                                    >
+                                        {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
+                                    </span>
+                                </div>
                                 <div className="text-center mt-3">
                                     <span
                                         className="pointer"

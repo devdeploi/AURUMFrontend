@@ -325,7 +325,7 @@ const MerchantList = ({ mode = 'admin' }) => {
                                 </Col>
                                 <Col md={6}>
                                     <h6 className="text-secondary text-uppercase small fw-bold">Account Details</h6>
-                                    <p className="mb-1"><strong>Plan:</strong> {selectedMerchant.plan}</p>
+                                    <p className="mb-1"><strong>Plan:</strong> {selectedMerchant.plan} <span className="text-muted small text-capitalize">({selectedMerchant.billingCycle || 'monthly'})</span></p>
                                     <p className="mb-1"><strong>Subscription:</strong>
                                         {selectedMerchant.subscriptionExpiryDate ?
                                             <span className="ms-1">
@@ -333,6 +333,11 @@ const MerchantList = ({ mode = 'admin' }) => {
                                                 {new Date(selectedMerchant.subscriptionExpiryDate) < new Date() && <Badge bg="danger" className="ms-2">Expired</Badge>}
                                             </span> : ' N/A'}
                                     </p>
+                                    {selectedMerchant.upcomingPlan && (
+                                        <p className="mb-1 text-info small">
+                                            <strong>Upcoming:</strong> {selectedMerchant.upcomingPlan} (from {new Date(selectedMerchant.planSwitchDate).toLocaleDateString()})
+                                        </p>
+                                    )}
                                     {mode !== 'public' && <p className="mb-1"><strong>Status:</strong> <span className={`text-${selectedMerchant.status === 'Approved' ? 'success' : 'warning'}`}>{selectedMerchant.status}</span></p>}
                                     <p className="mb-0"><strong>Joined:</strong> {new Date(selectedMerchant.createdAt).toLocaleDateString()}</p>
                                 </Col>

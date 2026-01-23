@@ -185,7 +185,6 @@ const UserList = () => {
                                         onError={onError}
                                     />
                                     <h4 className="fw-bold text-dark">{selectedUser.name}</h4>
-                                    <p className="text-secondary mb-2">{selectedUser.email}</p>
                                     <Badge bg={selectedUser.role === 'admin' ? 'danger' : selectedUser.role === 'merchant' ? 'warning' : 'info'} className="mb-3">
                                         {selectedUser.role.toUpperCase()}
                                     </Badge>
@@ -194,6 +193,10 @@ const UserList = () => {
                                         <div className="mb-2">
                                             <i className="fas fa-phone me-2 text-secondary"></i>
                                             {selectedUser.phone || 'N/A'}
+                                        </div>
+                                        <div className="mb-2 text-truncate">
+                                            <i className="fas fa-envelope me-2 text-secondary"></i>
+                                            <span className=''>{selectedUser.email || 'N/A'}</span>
                                         </div>
                                         <div className="mb-2">
                                             <i className="fas fa-map-marker-alt me-2 text-secondary"></i>

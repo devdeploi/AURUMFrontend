@@ -17,7 +17,7 @@ const PageLayout = ({ children, onSwitchToLogin }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="d-flex flex-column all-bold" style={{ backgroundColor: '#f9f9f9' }}>
+        <div className="d-flex flex-column all-bold" style={{ backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
             <style>{`
                 .all-bold, 
                 .all-bold div, 
@@ -53,7 +53,7 @@ const PageLayout = ({ children, onSwitchToLogin }) => {
             </Navbar>
 
             {/* Main Content Center */}
-            <div className="flex-grow-1 d-flex align-items-center justify-content-center py-5"
+            <div className="flex-grow-1 d-flex  align-items-center justify-content-center py-4"
                 style={{ backgroundColor: brandColor }}>
                 {children}
             </div>
@@ -133,7 +133,13 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
             name: 'Standard',
             price: formData.billingCycle === 'yearly' ? '₹15,000/yr' : '₹1500/mo',
             amount: formData.billingCycle === 'yearly' ? 15000 : 1500,
-            features: ['Manage up to 3 chits', 'Basic Analytics', 'Email Support'],
+            features: [
+                '3 Chits Only',
+                'Normal Dashboard',
+                'No Shop Image Uploads',
+                'Screen Blocking Ads',
+                'Email Support'
+            ],
             color: 'secondary',
             savings: formData.billingCycle === 'yearly' ? 'Save ₹3,000/yr' : ''
         },
@@ -141,7 +147,13 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
             name: 'Premium',
             price: formData.billingCycle === 'yearly' ? '₹50,000/yr' : '₹5000/mo',
             amount: formData.billingCycle === 'yearly' ? 50000 : 5000,
-            features: ['Manage up to 6 chits', 'Advanced Analytics', 'Priority 24/7 Support'],
+            features: [
+                'Up to 6 Chits',
+                'Advanced Dashboard',
+                'Unlimited Shop Images',
+                'No Screen Blocking Ads',
+                '24/7 Support'
+            ],
             color: 'secondary',
             savings: formData.billingCycle === 'yearly' ? 'Save ₹10,000/yr' : ''
         }
@@ -476,20 +488,20 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
     return (
         <PageLayout onSwitchToLogin={onSwitchToLogin}>
-            <Card className="shadow border-0" style={{ maxWidth: '800px', width: '100%', borderRadius: '15px', overflow: 'hidden' }}>
-                <div className="p-4 p-md-5">
+            <Card className="shadow border-0" style={{ maxWidth: step === 2 ? '1100px' : '750px', width: '100%', borderRadius: '12px', overflow: 'hidden', transition: 'max-width 0.3s ease' }}>
+                <div className="p-3 p-md-4">
                     {step > 0 && (
-                        <div className="text-center mb-4">
-                            <h3 className="fw-bold mb-1" style={{ color: '#915200' }}>Merchant Registration</h3>
-                            <div className="d-flex justify-content-center align-items-center gap-2 mt-3">
+                        <div className="text-center mb-3">
+                            <h4 className="fw-bold mb-2" style={{ color: '#915200', fontSize: '1.25rem' }}>Merchant Registration</h4>
+                            <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
                                 {[1, 2, 3, 4].map((s) => (
-                                    <div key={s} className={`rounded-circle d-flex align-items-center justify-content-center fw-bold small ${step === s ? 'bg-warning text-dark' : (step > s ? 'bg-success text-white' : 'bg-light text-muted')}`}
-                                        style={{ width: 30, height: 30, transition: 'all 0.3s' }}>
-                                        {step > s ? <i className="fas fa-check"></i> : s}
+                                    <div key={s} className={`rounded-circle d-flex align-items-center justify-content-center fw-bold ${step === s ? 'bg-warning text-dark' : (step > s ? 'bg-success text-white' : 'bg-light text-muted')}`}
+                                        style={{ width: 26, height: 26, fontSize: '0.75rem', transition: 'all 0.3s' }}>
+                                        {step > s ? <i className="fas fa-check" style={{ fontSize: '0.65rem' }}></i> : s}
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-muted small mt-2">
+                            <p className="text-muted small mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
                                 {step === 1 && "Choose Your Plan"}
                                 {step === 2 && "Business Details"}
                                 {step === 3 && "Verify Identity"}
@@ -501,8 +513,8 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
                     {/* Billing Cycle Toggle */}
                     {step === 1 && (
-                        <div className="d-flex justify-content-center align-items-center gap-3 mb-4">
-                            <span className={`fw-bold ${formData.billingCycle === 'monthly' ? 'text-dark' : 'text-muted'}`}>Monthly</span>
+                        <div className="d-flex justify-content-center align-items-center gap-2 mb-3">
+                            <span className={`fw-bold small ${formData.billingCycle === 'monthly' ? 'text-dark' : 'text-muted'}`}>Monthly</span>
                             <div className="form-check form-switch custom-switch">
                                 <input
                                     className="form-check-input"
@@ -511,11 +523,11 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                     id="regBillingSwitch"
                                     checked={formData.billingCycle === 'yearly'}
                                     onChange={() => setFormData(prev => ({ ...prev, billingCycle: prev.billingCycle === 'monthly' ? 'yearly' : 'monthly' }))}
-                                    style={{ width: '3em', height: '1.5em', cursor: 'pointer', backgroundColor: formData.billingCycle === 'yearly' ? brandColor : '#ddd', borderColor: 'transparent' }}
+                                    style={{ width: '2.5em', height: '1.3em', cursor: 'pointer', backgroundColor: formData.billingCycle === 'yearly' ? brandColor : '#ddd', borderColor: 'transparent' }}
                                 />
                             </div>
-                            <span className={`fw-bold ${formData.billingCycle === 'yearly' ? 'text-dark' : 'text-muted'}`}>
-                                Yearly <span className="badge bg-success ms-1 small">Save 17%</span>
+                            <span className={`fw-bold small ${formData.billingCycle === 'yearly' ? 'text-dark' : 'text-muted'}`}>
+                                Yearly <span className="badge bg-success ms-1" style={{ fontSize: '0.7rem' }}>Save 17%</span>
                             </span>
                         </div>
                     )}
@@ -567,15 +579,15 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                             `}</style>
 
                             {/* Animated Icon */}
-                            <div className="mb-4" style={{ animation: 'float 3s ease-in-out infinite' }}>
-                                <div className="d-inline-flex align-items-center justify-content-center rounded-circle mx-auto mb-3 position-relative"
+                            <div className="mb-3" style={{ animation: 'float 3s ease-in-out infinite' }}>
+                                <div className="d-inline-flex align-items-center justify-content-center rounded-circle mx-auto mb-2 position-relative"
                                     style={{
-                                        width: '100px',
-                                        height: '100px',
+                                        width: '70px',
+                                        height: '70px',
                                         background: `linear-gradient(135deg, ${brandColor}15, ${goldColor}15)`,
                                         animation: 'fadeInUp 0.6s ease-out'
                                     }}>
-                                    <i className="fas fa-envelope-open-text fa-3x" style={{ color: brandColor }}></i>
+                                    <i className="fas fa-envelope-open-text fa-2x" style={{ color: brandColor }}></i>
                                     <div className="position-absolute w-100 h-100 rounded-circle"
                                         style={{
                                             border: `2px solid ${goldColor}30`,
@@ -586,31 +598,31 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
                             {/* Title & Description */}
                             <div style={{ animation: 'fadeInUp 0.6s ease-out 0.1s backwards' }}>
-                                <h3 className="fw-bold mb-2" style={{
+                                <h4 className="fw-bold mb-2" style={{
                                     color: brandColor,
-                                    fontSize: '1.75rem',
+                                    fontSize: '1.5rem',
                                     letterSpacing: '-0.5px'
                                 }}>
                                     Welcome to AURUM
-                                </h3>
-                                <p className="text-muted mb-1" style={{ fontSize: '0.95rem' }}>
+                                </h4>
+                                <p className="text-muted mb-1" style={{ fontSize: '0.9rem' }}>
                                     Let's get you started on your journey
                                 </p>
-                                <p className="small text-muted mb-5" style={{ opacity: 0.7 }}>
+                                <p className="small text-muted mb-4" style={{ opacity: 0.7, fontSize: '0.85rem' }}>
                                     Enter your business email to begin
                                 </p>
                             </div>
 
                             {/* Form */}
-                            <Form onSubmit={handleCheckEmail} style={{ maxWidth: '450px', margin: '0 auto', animation: 'fadeInUp 0.6s ease-out 0.2s backwards' }}>
-                                <Form.Group className="mb-4 position-relative">
+                            <Form onSubmit={handleCheckEmail} style={{ maxWidth: '420px', margin: '0 auto', animation: 'fadeInUp 0.6s ease-out 0.2s backwards' }}>
+                                <Form.Group className="mb-3 position-relative">
                                     <div className="position-relative">
                                         <i className="fas fa-envelope position-absolute text-muted"
                                             style={{
-                                                left: '20px',
+                                                left: '16px',
                                                 top: '50%',
                                                 transform: 'translateY(-50%)',
-                                                fontSize: '1.1rem',
+                                                fontSize: '1rem',
                                                 opacity: 0.5
                                             }}></i>
                                         <Form.Control
@@ -620,19 +632,20 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                             value={formData.email}
                                             onChange={handleChange}
                                             required
-                                            size="lg"
                                             className="email-input-focus"
                                             style={{
-                                                paddingLeft: '50px',
-                                                paddingRight: '20px',
-                                                borderRadius: '12px',
+                                                paddingLeft: '45px',
+                                                paddingRight: '16px',
+                                                paddingTop: '0.6rem',
+                                                paddingBottom: '0.6rem',
+                                                borderRadius: '10px',
                                                 border: `2px solid ${brandColor}20`,
-                                                fontSize: '1rem',
+                                                fontSize: '0.95rem',
                                                 transition: 'all 0.3s ease'
                                             }}
                                         />
                                     </div>
-                                    <Form.Text className="text-muted small d-block mt-2 text-start ps-2">
+                                    <Form.Text className="text-muted small d-block mt-2 text-start ps-2" style={{ fontSize: '0.8rem' }}>
                                         <i className="fas fa-shield-alt me-1" style={{ color: goldColor }}></i>
                                         Your information is secure and encrypted
                                     </Form.Text>
@@ -641,11 +654,11 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                 <Button
                                     type="submit"
                                     disabled={loading || !formData.email}
-                                    className="continue-btn w-100 py-3 fw-bold text-white"
+                                    className="continue-btn w-100 py-2 fw-bold text-white"
                                     style={{
-                                        borderRadius: '12px',
-                                        fontSize: '1.05rem',
-                                        letterSpacing: '0.5px'
+                                        borderRadius: '10px',
+                                        fontSize: '0.95rem',
+                                        letterSpacing: '0.3px'
                                     }}
                                 >
                                     {loading ? (
@@ -662,18 +675,18 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                 </Button>
 
                                 {/* Trust Indicators */}
-                                <div className="d-flex justify-content-center gap-4 mt-4 pt-3 border-top">
+                                <div className="d-flex justify-content-center gap-3 mt-3 pt-2 border-top">
                                     <div className="text-center">
-                                        <i className="fas fa-lock mb-1" style={{ color: goldColor, fontSize: '1.2rem' }}></i>
-                                        <p className="small text-muted mb-0">Secure</p>
+                                        <i className="fas fa-lock mb-1" style={{ color: goldColor, fontSize: '1rem' }}></i>
+                                        <p className="small text-muted mb-0" style={{ fontSize: '0.75rem' }}>Secure</p>
                                     </div>
                                     <div className="text-center">
-                                        <i className="fas fa-clock mb-1" style={{ color: goldColor, fontSize: '1.2rem' }}></i>
-                                        <p className="small text-muted mb-0">Quick Setup</p>
+                                        <i className="fas fa-clock mb-1" style={{ color: goldColor, fontSize: '1rem' }}></i>
+                                        <p className="small text-muted mb-0" style={{ fontSize: '0.75rem' }}>Quick Setup</p>
                                     </div>
                                     <div className="text-center">
-                                        <i className="fas fa-check-circle mb-1" style={{ color: goldColor, fontSize: '1.2rem' }}></i>
-                                        <p className="small text-muted mb-0">Verified</p>
+                                        <i className="fas fa-check-circle mb-1" style={{ color: goldColor, fontSize: '1rem' }}></i>
+                                        <p className="small text-muted mb-0" style={{ fontSize: '0.75rem' }}>Verified</p>
                                     </div>
                                 </div>
                             </Form>
@@ -750,18 +763,18 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                 }
                             `}</style>
 
-                            <div className="text-center" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
-                                <h4 className="fw-bold mb-2" style={{ color: brandColor }}>
+                            <div className="text-center mb-2" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
+                                <h5 className="fw-bold mb-1" style={{ color: brandColor, fontSize: '1.15rem' }}>
                                     Choose Your Perfect Plan
-                                </h4>
-                                <p className="text-muted small">Select a plan that fits your business needs</p>
+                                </h5>
+                                <p className="text-muted small mb-0" style={{ fontSize: '0.85rem' }}>Select a plan that fits your business needs</p>
                             </div>
 
-                            <Row className="g-4">
+                            <Row className="g-3">
                                 {plans.map((plan, index) => (
                                     <Col md={6} key={plan.name}>
                                         <div
-                                            className={`plan-card p-4 rounded-4 border h-100 d-flex flex-column ${formData.plan === plan.name ? 'selected' : ''}`}
+                                            className={`plan-card p-3 rounded-3 border h-100 d-flex flex-column ${formData.plan === plan.name ? 'selected' : ''}`}
                                             style={{
                                                 border: formData.plan === plan.name ? `2px solid ${brandColor}` : '2px solid #e9ecef',
                                                 backgroundColor: 'white',
@@ -771,23 +784,23 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                         >
                                             {/* Selected Badge */}
                                             {formData.plan === plan.name && (
-                                                <div className="position-absolute top-0 end-0 m-3">
+                                                <div className="position-absolute top-0 end-0 m-2">
                                                     <div className="d-flex align-items-center gap-1 px-2 py-1 rounded-pill"
                                                         style={{
                                                             background: `linear-gradient(135deg, ${brandColor}, ${goldColor})`,
                                                             animation: 'pulse 2s infinite'
                                                         }}>
-                                                        <i className="fas fa-check-circle text-white" style={{ fontSize: '0.9rem' }}></i>
-                                                        <span className="text-white small fw-bold">Selected</span>
+                                                        <i className="fas fa-check-circle text-white" style={{ fontSize: '0.75rem' }}></i>
+                                                        <span className="text-white fw-bold" style={{ fontSize: '0.7rem' }}>Selected</span>
                                                     </div>
                                                 </div>
                                             )}
 
                                             {/* Savings Badge */}
                                             {plan.savings && (
-                                                <div className="position-absolute top-0 start-0 m-3">
-                                                    <span className="badge bg-success text-white px-3 py-2 rounded-pill shadow-sm"
-                                                        style={{ fontSize: '0.75rem', animation: 'fadeInUp 0.6s ease-out 0.3s backwards' }}>
+                                                <div className="position-absolute top-0 start-0 m-2">
+                                                    <span className="badge bg-success text-white px-2 py-1 rounded-pill shadow-sm"
+                                                        style={{ fontSize: '0.65rem', animation: 'fadeInUp 0.6s ease-out 0.3s backwards' }}>
                                                         <i className="fas fa-tag me-1"></i>{plan.savings}
                                                     </span>
                                                 </div>
@@ -795,42 +808,43 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
                                             <div className="flex-grow-1">
                                                 {/* Plan Header */}
-                                                <div className="text-center mb-4 mt-3">
-                                                    <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                                                <div className="text-center mb-3 mt-2">
+                                                    <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-2"
                                                         style={{
-                                                            width: '60px',
-                                                            height: '60px',
+                                                            width: '50px',
+                                                            height: '50px',
                                                             background: `linear-gradient(135deg, ${brandColor}15, ${goldColor}15)`,
                                                             border: `2px solid ${formData.plan === plan.name ? brandColor : '#e9ecef'}`
                                                         }}>
                                                         <i className={`fas ${plan.name === 'Premium' ? 'fa-crown' : 'fa-gem'}`}
                                                             style={{
                                                                 color: formData.plan === plan.name ? brandColor : '#6c757d',
-                                                                fontSize: '1.5rem'
+                                                                fontSize: '1.2rem'
                                                             }}></i>
                                                     </div>
-                                                    <h5 className="fw-bold mb-2 text-uppercase"
+                                                    <h6 className="fw-bold mb-2 text-uppercase"
                                                         style={{
-                                                            letterSpacing: '1px',
+                                                            letterSpacing: '0.5px',
+                                                            fontSize: '0.95rem',
                                                             color: formData.plan === plan.name ? brandColor : '#2c3e50'
                                                         }}>
                                                         {plan.name}
-                                                    </h5>
+                                                    </h6>
                                                     <div className="d-flex align-items-baseline justify-content-center gap-1">
-                                                        <h2 className="fw-bold mb-0" style={{ color: brandColor, fontSize: '2rem' }}>
+                                                        <h3 className="fw-bold mb-0" style={{ color: brandColor, fontSize: '1.6rem' }}>
                                                             {plan.price.split('/')[0]}
-                                                        </h2>
-                                                        <span className="text-muted">/{plan.price.split('/')[1]}</span>
+                                                        </h3>
+                                                        <span className="text-muted small">/{plan.price.split('/')[1]}</span>
                                                     </div>
                                                 </div>
 
                                                 {/* Features List */}
                                                 <ul className="list-unstyled mb-0">
                                                     {plan.features.map((feature, i) => (
-                                                        <li key={i} className="feature-item d-flex align-items-start">
+                                                        <li key={i} className="feature-item d-flex align-items-start" style={{ padding: '5px 0' }}>
                                                             <i className="fas fa-check-circle me-2 mt-1"
-                                                                style={{ color: goldColor, fontSize: '0.9rem' }}></i>
-                                                            <span className="small" style={{ color: '#4a5568' }}>{feature}</span>
+                                                                style={{ color: goldColor, fontSize: '0.75rem' }}></i>
+                                                            <span style={{ color: '#4a5568', fontSize: '0.85rem' }}>{feature}</span>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -838,15 +852,17 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
                                             {/* Select Button */}
                                             <Button
-                                                className="select-plan-btn mt-4 w-100 py-2 fw-bold rounded-pill"
+                                                className="select-plan-btn mt-3 w-100 py-2 fw-bold rounded-pill"
                                                 style={formData.plan === plan.name ? {
                                                     background: `linear-gradient(135deg, ${brandColor}, ${goldColor})`,
                                                     border: 'none',
-                                                    color: 'white'
+                                                    color: 'white',
+                                                    fontSize: '0.85rem'
                                                 } : {
                                                     background: 'white',
                                                     border: `2px solid ${brandColor}30`,
-                                                    color: brandColor
+                                                    color: brandColor,
+                                                    fontSize: '0.85rem'
                                                 }}
                                             >
                                                 {formData.plan === plan.name ? (
@@ -867,12 +883,12 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                             </Row>
 
                             {/* Additional Info */}
-                            <div className="text-center mt-4 pt-3 border-top">
+                            {/* <div className="text-center mt-4 pt-3 border-top">
                                 <p className="small text-muted mb-0">
                                     <i className="fas fa-info-circle me-1" style={{ color: goldColor }}></i>
                                     You can upgrade or downgrade your plan anytime
                                 </p>
-                            </div>
+                            </div> */}
                         </div>
                     )}
 
@@ -883,21 +899,22 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                 .form-section {
                                     background: linear-gradient(135deg, ${brandColor}03, ${goldColor}03);
                                     border-left: 3px solid ${brandColor};
-                                    padding: 1.5rem;
-                                    border-radius: 12px;
-                                    margin-bottom: 1.5rem;
+                                    padding: 1rem;
+                                    border-radius: 8px;
+                                    margin-bottom: 1rem;
                                     animation: fadeInUp 0.5s ease-out backwards;
                                 }
                                 .form-label-icon {
                                     color: ${goldColor};
-                                    margin-right: 8px;
-                                    font-size: 0.9rem;
+                                    margin-right: 6px;
+                                    font-size: 0.8rem;
                                 }
                                 .custom-input {
                                     border: 2px solid #e9ecef;
-                                    border-radius: 10px;
+                                    border-radius: 8px;
                                     transition: all 0.3s ease;
-                                    padding: 0.65rem 1rem;
+                                    padding: 0.5rem 0.85rem;
+                                    font-size: 0.9rem;
                                 }
                                 .custom-input:focus {
                                     border-color: ${brandColor};
@@ -909,8 +926,8 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                 }
                                 .upload-area {
                                     border: 2px dashed ${brandColor}40;
-                                    border-radius: 12px;
-                                    padding: 1.5rem;
+                                    border-radius: 8px;
+                                    padding: 1rem;
                                     transition: all 0.3s ease;
                                     background: linear-gradient(135deg, ${brandColor}05, transparent);
                                 }
@@ -919,30 +936,30 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                     background: linear-gradient(135deg, ${brandColor}08, transparent);
                                 }
                                 .password-strength-bar {
-                                    height: 4px;
+                                    height: 3px;
                                     border-radius: 2px;
                                     transition: all 0.3s ease;
                                 }
                                 .file-preview {
                                     background: linear-gradient(135deg, #f8f9fa, #ffffff);
                                     border: 2px solid ${goldColor}30;
-                                    border-radius: 10px;
-                                    padding: 1rem;
+                                    border-radius: 8px;
+                                    padding: 0.75rem;
                                     animation: slideInScale 0.3s ease-out;
                                 }
                             `}</style>
 
-                            {/* Business Information Section */}
+                            {/* Business Information & Document Verification */}
                             <div className="form-section" style={{ animationDelay: '0.1s' }}>
-                                <h6 className="fw-bold mb-3 d-flex align-items-center" style={{ color: brandColor }}>
+                                <h6 className="fw-bold mb-3 d-flex align-items-center" style={{ color: brandColor, fontSize: '0.95rem' }}>
                                     <i className="fas fa-building form-label-icon"></i>
-                                    Business Information
+                                    Business Details & Verification
                                 </h6>
                                 <Row className="g-3">
-                                    <Col md={6}>
+                                    <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-store me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-store me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 Business Name
                                             </Form.Label>
                                             <Form.Control
@@ -955,10 +972,10 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6}>
+                                    <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-envelope me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-envelope me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 Email Address
                                             </Form.Label>
                                             <Form.Control
@@ -974,10 +991,10 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6}>
+                                    <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-phone me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-phone me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 Phone Number
                                             </Form.Label>
                                             <Form.Control
@@ -989,16 +1006,16 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                                 maxLength="10"
                                                 className="custom-input"
                                             />
-                                            <Form.Text className="text-muted small">
+                                            <Form.Text className="text-muted small" style={{ fontSize: '0.75rem' }}>
                                                 <i className="fas fa-info-circle me-1"></i>
                                                 We'll send OTP to this number
                                             </Form.Text>
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6}>
+                                    <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-file-invoice me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-file-invoice me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 GSTIN Number
                                             </Form.Label>
                                             <Form.Control
@@ -1011,110 +1028,106 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={12}>
+                                    <Col md={4}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-map-marker-alt me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-map-marker-alt me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 Business Address
                                             </Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 rows={2}
                                                 name="address"
-                                                placeholder="Enter complete business address with pincode"
+                                                placeholder="Enter complete business address"
                                                 required
                                                 onChange={handleChange}
                                                 value={formData.address}
                                                 className="custom-input"
+                                                style={{ height: '5rem' }}
                                             />
+                                        </Form.Group>
+                                    </Col>
+
+                                    {/* Document Upload within Grid */}
+                                    <Col md={4}>
+                                        <Form.Group>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-certificate me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
+                                                GSTIN Cert / Address Proof
+                                            </Form.Label>
+                                            {formData.addressProof ? (
+                                                <div className="file-preview p-2 d-flex align-items-center justify-content-between" style={{ height: '5rem', overflow: 'hidden' }}>
+                                                    <div className="d-flex align-items-center gap-2" style={{ minWidth: 0 }}>
+                                                        <div className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                                            style={{
+                                                                width: '32px',
+                                                                height: '32px',
+                                                                background: `linear-gradient(135deg, ${brandColor}15, ${goldColor}15)`
+                                                            }}>
+                                                            <i className="fas fa-file-image" style={{ color: brandColor, fontSize: '0.9rem' }}></i>
+                                                        </div>
+                                                        <div style={{ minWidth: 0 }}>
+                                                            <p className="mb-0 fw-bold text-truncate small" style={{ fontSize: '0.8rem' }}>
+                                                                {formData.addressProof}
+                                                            </p>
+                                                            <small className="text-success d-flex align-items-center" style={{ fontSize: '0.7rem' }}>
+                                                                <i className="fas fa-check-circle me-1"></i>
+                                                                Uploaded
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        variant="link"
+                                                        size="sm"
+                                                        onClick={handleRemoveFile}
+                                                        className="p-0 ms-1 text-danger"
+                                                    >
+                                                        <i className="fas fa-times"></i>
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="upload-area p-2 d-flex align-items-center justify-content-center"
+                                                    style={{ height: '5rem', border: `2px dashed ${brandColor}40`, background: `linear-gradient(135deg, ${brandColor}05, transparent)` }}>
+                                                    <div className="text-center w-100 position-relative">
+                                                        <Form.Control
+                                                            type="file"
+                                                            onChange={handleFileUpload}
+                                                            disabled={uploading}
+                                                            accept="image/*"
+                                                            required={!formData.addressProof}
+                                                            className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                        {uploading ? (
+                                                            <div className="d-flex align-items-center justify-content-center small text-muted">
+                                                                <Spinner animation="border" size="sm" className="me-2" />
+                                                                Uploading...
+                                                            </div>
+                                                        ) : (
+                                                            <div className="d-flex align-items-center justify-content-center gap-2">
+                                                                <i className="fas fa-cloud-upload-alt fa-lg" style={{ color: brandColor }}></i>
+                                                                <span className="small text-muted" style={{ fontSize: '0.85rem' }}>Click to Upload</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
                             </div>
 
-                            {/* Document Upload Section */}
-                            <div className="form-section" style={{ animationDelay: '0.2s' }}>
-                                <h6 className="fw-bold mb-3 d-flex align-items-center" style={{ color: brandColor }}>
-                                    <i className="fas fa-file-upload form-label-icon"></i>
-                                    Document Verification
-                                </h6>
-                                <Form.Group>
-                                    <Form.Label className="small fw-bold text-muted mb-2">
-                                        <i className="fas fa-certificate me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
-                                        GSTIN Certificate / Address Proof
-                                    </Form.Label>
-                                    {formData.addressProof ? (
-                                        <div className="file-preview">
-                                            <div className="d-flex align-items-center justify-content-between">
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <div className="d-flex align-items-center justify-content-center rounded-circle"
-                                                        style={{
-                                                            width: '50px',
-                                                            height: '50px',
-                                                            background: `linear-gradient(135deg, ${brandColor}15, ${goldColor}15)`
-                                                        }}>
-                                                        <i className="fas fa-file-image fa-lg" style={{ color: brandColor }}></i>
-                                                    </div>
-                                                    <div>
-                                                        <p className="mb-0 fw-bold small text-truncate" style={{ maxWidth: '300px' }}>
-                                                            {formData.addressProof}
-                                                        </p>
-                                                        <small className="text-success d-flex align-items-center">
-                                                            <i className="fas fa-check-circle me-1"></i>
-                                                            Successfully uploaded
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={handleRemoveFile}
-                                                    className="rounded-pill"
-                                                >
-                                                    <i className="fas fa-times me-1"></i>
-                                                    Remove
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="upload-area">
-                                            <div className="text-center">
-                                                <i className="fas fa-cloud-upload-alt fa-3x mb-3" style={{ color: brandColor, opacity: 0.5 }}></i>
-                                                <Form.Control
-                                                    type="file"
-                                                    onChange={handleFileUpload}
-                                                    disabled={uploading}
-                                                    accept="image/*"
-                                                    required={!formData.addressProof}
-                                                    className="mb-2"
-                                                />
-                                                {uploading && (
-                                                    <div className="d-flex align-items-center justify-content-center text-muted small mt-2">
-                                                        <Spinner animation="border" size="sm" className="me-2" style={{ color: brandColor }} />
-                                                        Uploading your document...
-                                                    </div>
-                                                )}
-                                                <Form.Text className="text-muted d-block">
-                                                    <i className="fas fa-info-circle me-1"></i>
-                                                    Upload clear image of GSTIN certificate or address proof (Max 5MB)
-                                                </Form.Text>
-                                            </div>
-                                        </div>
-                                    )}
-                                </Form.Group>
-                            </div>
-
                             {/* Security Section */}
                             <div className="form-section" style={{ animationDelay: '0.3s' }}>
-                                <h6 className="fw-bold mb-3 d-flex align-items-center" style={{ color: brandColor }}>
+                                <h6 className="fw-bold mb-2 d-flex align-items-center" style={{ color: brandColor, fontSize: '0.95rem' }}>
                                     <i className="fas fa-shield-alt form-label-icon"></i>
                                     Account Security
                                 </h6>
-                                <Row className="g-3">
+                                <Row className="g-2">
                                     <Col md={6}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-lock me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-lock me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 Create Password
                                             </Form.Label>
                                             <InputGroup>
@@ -1135,7 +1148,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                                         background: 'white',
                                                         border: '2px solid #e9ecef',
                                                         borderLeft: 'none',
-                                                        borderRadius: '0 10px 10px 0'
+                                                        borderRadius: '0 8px 8px 0'
                                                     }}
                                                 >
                                                     <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} style={{ color: brandColor }}></i>
@@ -1143,8 +1156,9 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                             </InputGroup>
                                             <div className="mt-2">
                                                 <div className="d-flex justify-content-between align-items-center mb-1">
-                                                    <small className="text-muted">Password Strength</small>
+                                                    <small className="text-muted" style={{ fontSize: '0.75rem' }}>Password Strength</small>
                                                     <small className="fw-bold" style={{
+                                                        fontSize: '0.75rem',
                                                         color: passwordStrength < 50 ? '#dc3545' : passwordStrength < 80 ? '#ffc107' : '#28a745'
                                                     }}>
                                                         {passwordStrength < 50 ? 'Weak' : passwordStrength < 80 ? 'Medium' : 'Strong'}
@@ -1160,8 +1174,8 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group>
-                                            <Form.Label className="small fw-bold text-muted mb-2">
-                                                <i className="fas fa-check-circle me-1" style={{ color: goldColor, fontSize: '0.8rem' }}></i>
+                                            <Form.Label className="small fw-bold text-muted mb-1" style={{ fontSize: '0.85rem' }}>
+                                                <i className="fas fa-check-circle me-1" style={{ color: goldColor, fontSize: '0.75rem' }}></i>
                                                 Confirm Password
                                             </Form.Label>
                                             <InputGroup>
@@ -1182,20 +1196,20 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                                         background: 'white',
                                                         border: '2px solid #e9ecef',
                                                         borderLeft: 'none',
-                                                        borderRadius: '0 10px 10px 0'
+                                                        borderRadius: '0 8px 8px 0'
                                                     }}
                                                 >
                                                     <i className={showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"} style={{ color: brandColor }}></i>
                                                 </InputGroup.Text>
                                             </InputGroup>
                                             {passwordError && (
-                                                <small className="text-danger d-block mt-2">
+                                                <small className="text-danger d-block mt-1" style={{ fontSize: '0.75rem' }}>
                                                     <i className="fas fa-exclamation-circle me-1"></i>
                                                     {passwordError}
                                                 </small>
                                             )}
                                             {confirmPassword && formData.password === confirmPassword && (
-                                                <small className="text-success d-block mt-2">
+                                                <small className="text-success d-block mt-1" style={{ fontSize: '0.75rem' }}>
                                                     <i className="fas fa-check-circle me-1"></i>
                                                     Passwords match
                                                 </small>
@@ -1203,38 +1217,38 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                         </Form.Group>
                                     </Col>
                                 </Row>
-                                <div className="mt-3 p-3 rounded" style={{ background: `${brandColor}08` }}>
-                                    <small className="text-muted d-block mb-1 fw-bold">
+                                {/* <div className="mt-2 p-2 rounded" style={{ background: `${brandColor}08` }}>
+                                    <small className="text-muted d-block mb-1 fw-bold" style={{ fontSize: '0.75rem' }}>
                                         <i className="fas fa-info-circle me-1" style={{ color: goldColor }}></i>
                                         Password Requirements:
                                     </small>
-                                    <div className="d-flex flex-wrap gap-2">
-                                        <small className={`badge ${formData.password.length >= 8 ? 'bg-success' : 'bg-secondary'}`}>
+                                    <div className="d-flex flex-wrap gap-1">
+                                        <small className={`badge ${formData.password.length >= 8 ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.7rem' }}>
                                             8+ characters
                                         </small>
-                                        <small className={`badge ${/[A-Z]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`}>
+                                        <small className={`badge ${/[A-Z]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.7rem' }}>
                                             Uppercase
                                         </small>
-                                        <small className={`badge ${/[a-z]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`}>
+                                        <small className={`badge ${/[a-z]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.7rem' }}>
                                             Lowercase
                                         </small>
-                                        <small className={`badge ${/[0-9]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`}>
+                                        <small className={`badge ${/[0-9]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.7rem' }}>
                                             Number
                                         </small>
-                                        <small className={`badge ${/[^A-Za-z0-9]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`}>
+                                        <small className={`badge ${/[^A-Za-z0-9]/.test(formData.password) ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '0.7rem' }}>
                                             Special char
                                         </small>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="d-flex gap-3 mt-4" style={{ animation: 'fadeInUp 0.5s ease-out 0.4s backwards' }}>
+                            <div className="d-flex gap-2 mt-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.4s backwards' }}>
                                 <Button
                                     variant="outline-secondary"
-                                    className="px-4 py-2 rounded-pill"
+                                    className="px-3 py-2 rounded-pill"
                                     onClick={() => setStep(1)}
-                                    style={{ borderWidth: '2px' }}
+                                    style={{ borderWidth: '2px', fontSize: '0.9rem' }}
                                 >
                                     <i className="fas fa-arrow-left me-2"></i>
                                     Back
@@ -1256,7 +1270,8 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                     style={{
                                         background: `linear-gradient(135deg, ${brandColor}, ${goldColor})`,
                                         border: 'none',
-                                        color: 'white'
+                                        color: 'white',
+                                        fontSize: '0.9rem'
                                     }}
                                 >
                                     {loading ? (
@@ -1277,13 +1292,13 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
                     {/* Step 3: OTP Verification */}
                     {step === 3 && (
-                        <div className="text-center py-4">
-                            <div className="mb-4">
-                                <div className="mx-auto bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 80, height: 80 }}>
-                                    <i className="fas fa-shield-alt fa-3x" style={{ color: '#915200' }}></i>
+                        <div className="text-center py-3">
+                            <div className="mb-3">
+                                <div className="mx-auto bg-light rounded-circle d-flex align-items-center justify-content-center mb-2" style={{ width: 60, height: 60 }}>
+                                    <i className="fas fa-shield-alt fa-2x" style={{ color: '#915200' }}></i>
                                 </div>
-                                <h5 className="fw-bold mb-2">Verify Contact Details</h5>
-                                <p className="text-muted small px-3">
+                                <h5 className="fw-bold mb-2" style={{ fontSize: '1.1rem' }}>Verify Contact Details</h5>
+                                <p className="text-muted small px-3 mb-0" style={{ fontSize: '0.85rem' }}>
                                     We've sent a verification code to both your email and phone number.
                                     <br />
                                     Enter the code from either source below.
@@ -1291,7 +1306,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                             </div>
 
                             <form onSubmit={handleVerifyOtp}>
-                                <div className="d-flex justify-content-center mb-5">
+                                <div className="d-flex justify-content-center mb-4">
                                     <OtpInput
                                         value={otp}
                                         onChange={setOtp}
@@ -1301,11 +1316,11 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                             <input
                                                 {...props}
                                                 style={{
-                                                    width: "45px",
-                                                    height: "50px",
+                                                    width: "38px",
+                                                    height: "44px",
                                                     border: "1px solid #ced4da",
-                                                    borderRadius: "8px",
-                                                    fontSize: "1.5rem",
+                                                    borderRadius: "6px",
+                                                    fontSize: "1.3rem",
                                                     textAlign: "center",
                                                     color: "#915200",
                                                     fontWeight: "bold",
@@ -1316,25 +1331,26 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                     />
                                 </div>
 
-                                <div className="d-flex gap-3">
-                                    <Button variant="outline-secondary" className="px-4 rounded-pill" onClick={() => setStep(2)}>Back</Button>
+                                <div className="d-flex gap-2">
+                                    <Button variant="outline-secondary" className="px-3 py-2 rounded-pill" onClick={() => setStep(2)} style={{ fontSize: '0.9rem' }}>Back</Button>
                                     <Button
                                         type="submit"
-                                        className="flex-grow-1 text-white rounded-pill fw-bold"
+                                        className="flex-grow-1 text-white rounded-pill fw-bold py-2"
                                         disabled={loading || otp.length < 6}
-                                        style={{ backgroundColor: '#915200', borderColor: '#915200' }}
+                                        style={{ backgroundColor: '#915200', borderColor: '#915200', fontSize: '0.9rem' }}
                                     >
                                         {loading ? <Spinner size="sm" animation="border" /> : "Verify & Continue"}
                                     </Button>
                                 </div>
                                 <div className="text-center mt-3">
-                                    <span className="text-muted small">Didn't receive code? </span>
+                                    <span className="text-muted small" style={{ fontSize: '0.85rem' }}>Didn't receive code? </span>
                                     <span
-                                        className="fw-bold"
+                                        className="fw-bold small"
                                         style={{
                                             cursor: resendTimer > 0 ? 'not-allowed' : 'pointer',
                                             color: resendTimer > 0 ? '#6c757d' : '#915200',
-                                            textDecoration: resendTimer > 0 ? 'none' : 'underline'
+                                            textDecoration: resendTimer > 0 ? 'none' : 'underline',
+                                            fontSize: '0.85rem'
                                         }}
                                         onClick={resendTimer > 0 ? null : handleRequestOtp}
                                     >
@@ -1348,33 +1364,33 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                     {/* Step 4: Payment */}
                     {step === 4 && (
                         <div>
-                            <div className="text-center mb-4">
-                                <h5 className="mb-1" style={{ color: '#915200' }}>Review & Complete Payment</h5>
-                                <p className="text-muted small">Activate your merchant account</p>
+                            <div className="text-center mb-3">
+                                <h5 className="mb-1" style={{ color: '#915200', fontSize: '1.1rem' }}>Review & Complete Payment</h5>
+                                <p className="text-muted small mb-0" style={{ fontSize: '0.85rem' }}>Activate your merchant account</p>
                             </div>
 
-                            <div className="p-4 bg-light rounded-4 mb-4 border border-warning border-opacity-25">
-                                <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                    <span className="text-muted">Selected Plan</span>
-                                    <span className="fw-bold text-dark">{formData.plan}</span>
+                            <div className="p-3 bg-light rounded-3 mb-3 border border-warning border-opacity-25">
+                                <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                    <span className="text-muted small">Selected Plan</span>
+                                    <span className="fw-bold text-dark small">{formData.plan}</span>
                                 </div>
-                                <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                    <span className="text-muted">Business Name</span>
-                                    <span className="fw-bold text-dark">{formData.name}</span>
+                                <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                    <span className="text-muted small">Business Name</span>
+                                    <span className="fw-bold text-dark small">{formData.name}</span>
                                 </div>
-                                <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                    <span className="text-muted">Email</span>
-                                    <span className="fw-bold text-dark">{formData.email}</span>
+                                <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                    <span className="text-muted small">Email</span>
+                                    <span className="fw-bold text-dark small">{formData.email}</span>
                                 </div>
                                 <div className="d-flex justify-content-between align-items-center pt-2">
-                                    <span className="fw-bold" style={{ color: '#915200' }}>Total Amount Payable</span>
-                                    <span className="h3 mb-0 fw-bold" style={{ color: '#915200' }}>
+                                    <span className="fw-bold small" style={{ color: '#915200' }}>Total Amount Payable</span>
+                                    <span className="h4 mb-0 fw-bold" style={{ color: '#915200' }}>
                                         {plans.find(p => p.name === formData.plan)?.price}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="d-flex gap-2 mb-4 align-items-start">
+                            <div className="d-flex gap-2 mb-3 align-items-start">
                                 <Form.Check
                                     type="checkbox"
                                     id="termsCheckbox"
@@ -1382,25 +1398,24 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                     onChange={(e) => setTermsAccepted(e.target.checked)}
                                     className="mt-1"
                                 />
-                                <small className="text-muted lh-sm mt-2">
+                                <small className="text-muted lh-sm mt-2" style={{ fontSize: '0.8rem' }}>
                                     I agree to the <a href="/terms" target="_blank" className="fw-bold text-decoration-none" style={{ color: '#915200' }}>Terms of Service</a> and <a href="/privacy" target="_blank" className="fw-bold text-decoration-none" style={{ color: '#915200' }}>Privacy Policy</a>.
                                 </small>
                             </div>
 
-                            <div className="alert alert-danger border-danger border-2 d-flex align-items-center mb-4" role="alert">
-                                <i className="fas fa-exclamation-circle fa-2x me-3 text-danger"></i>
+                            <div className="alert alert-danger border-danger border-2 d-flex align-items-center mb-3 py-2" role="alert">
+                                <i className="fas fa-exclamation-circle fa-lg me-2 text-danger"></i>
                                 <div>
-                                    <h6 className="fw-bold mb-1 text-danger">Mandatory Requirement</h6>
-                                    <p className="mb-0 small text-dark">Configuring a valid <strong>Razorpay</strong> account is <strong>MANDATORY</strong> before you can fully register and activate your Merchant account.</p>
+                                    <h6 className="fw-bold mb-1 text-danger" style={{ fontSize: '0.9rem' }}>Mandatory Requirement</h6>
+                                    <p className="mb-0 small text-dark" style={{ fontSize: '0.8rem' }}>Configuring a valid <strong>Razorpay</strong> account is <strong>MANDATORY</strong> before you can fully register and activate your Merchant account.</p>
                                 </div>
                             </div>
 
                             <Button
                                 onClick={handlePaymentAndRegister}
                                 disabled={loading || !termsAccepted}
-                                size="lg"
-                                className="w-100 py-3 text-white fw-bold shadow-sm"
-                                style={{ backgroundColor: '#915200', borderColor: '#915200', borderRadius: '50px' }}
+                                className="w-100 py-2 text-white fw-bold shadow-sm"
+                                style={{ backgroundColor: '#915200', borderColor: '#915200', borderRadius: '50px', fontSize: '0.95rem' }}
                             >
                                 {loading ? <Spinner size="sm" animation="border" /> : <span><i className="fas fa-lock me-2"></i>Pay Securely & Register</span>}
                             </Button>

@@ -54,7 +54,13 @@ const LandingPage = () => {
             name: 'Standard',
             price: billingCycle === 'yearly' ? '₹15,000' : '₹1500',
             period: billingCycle === 'yearly' ? '/yr' : '/mo',
-            features: ['Manage up to 3 chits', 'Basic Analytics', 'Email Support'],
+            features: [
+                '3 Chits Only',
+                'Normal Dashboard',
+                'No Shop Image Uploads',
+                'Screen Blocking Ads',
+                'Email Support'
+            ],
             recommended: false,
             savings: billingCycle === 'yearly' ? 'Save ₹3,000/yr' : ''
         },
@@ -62,7 +68,13 @@ const LandingPage = () => {
             name: 'Premium',
             price: billingCycle === 'yearly' ? '₹50,000' : '₹5000',
             period: billingCycle === 'yearly' ? '/yr' : '/mo',
-            features: ['Manage up to 6 chits', 'Advanced Analytics', 'Priority 24/7 Support'],
+            features: [
+                'Up to 6 Chits',
+                'Advanced Dashboard',
+                'Unlimited Shop Images',
+                'No Screen Blocking Ads',
+                '24/7 Support'
+            ],
             recommended: true,
             savings: billingCycle === 'yearly' ? 'Save ₹10,000/yr' : ''
         }

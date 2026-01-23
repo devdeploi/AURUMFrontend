@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Badge, Modal } from 'react-bootstrap';
 import BottomNav from './BottomNav';
 import './Dashboard.css';
@@ -7,7 +7,10 @@ import ManageChits from './ManageChits';
 import SubscriptionExpired from './SubscriptionExpired';
 import axios from 'axios';
 import MerchantSubscribers from './MerchantSubscribers';
+
 import { APIURL } from '../utils/Function';
+import SchoolHubAd from './ads/SchoolHubAd';
+import QuickproAd from './ads/QuickproAd';
 
 // ... existing imports ...
 import {
@@ -66,6 +69,44 @@ const MerchantDashboard = ({ user, onLogout }) => {
     const [showRenewalModal, setShowRenewalModal] = useState(false);
     const [blockingRenewal, setBlockingRenewal] = useState(false);
     const [showFeatureModal, setShowFeatureModal] = useState(false);
+
+    // Ad State
+    const [showAd, setShowAd] = useState(false);
+    const [selectedAd, setSelectedAd] = useState('quickpro');
+    const activeTabRef = useRef(activeTab);
+
+    // Update ref when tab changes to avoid closure staleness in interval
+    useEffect(() => {
+        activeTabRef.current = activeTab;
+        // If we switch to profile, immediately hide ad (optional but User asked for it on mobile)
+        if (activeTab === 'profile') {
+            setShowAd(false);
+        }
+    }, [activeTab]);
+
+    // Ad Timer Logic
+    useEffect(() => {
+        // Initial delay 60s
+        const initialTimeout = setTimeout(() => {
+            if (activeTabRef.current !== 'profile' && !showRenewalModal && !blockingRenewal) {
+                setSelectedAd(Math.random() > 0.5 ? 'quickpro' : 'schoolhub');
+                setShowAd(true);
+            }
+
+            // Start cyclic timer
+            const interval = setInterval(() => {
+                // Check conditions before showing
+                if (activeTabRef.current !== 'profile' && !showRenewalModal && !blockingRenewal) {
+                    setSelectedAd(Math.random() > 0.5 ? 'quickpro' : 'schoolhub');
+                    setShowAd(true);
+                }
+            }, 60000); // Every 60 seconds
+
+            return () => clearInterval(interval);
+        }, 60000);
+
+        return () => clearTimeout(initialTimeout);
+    }, []); // Run once on mount
 
     // Fetch latest profile on mount
     useEffect(() => {
@@ -733,6 +774,23 @@ const MerchantDashboard = ({ user, onLogout }) => {
 
     return (
         <div className="dashboard-container">
+            {/* Ad Components */}
+            {/* Ad Components - Do not show on Profile tab */}
+            {activeTab !== 'profile' && (
+                <>
+                    <SchoolHubAd
+                        visible={showAd && selectedAd === 'schoolhub'}
+                        onClose={() => setShowAd(false)}
+                        variant={isPremium ? 'banner' : 'full'}
+                    />
+                    <QuickproAd
+                        visible={showAd && selectedAd === 'quickpro'}
+                        onClose={() => setShowAd(false)}
+                        variant={isPremium ? 'banner' : 'full'}
+                    />
+                </>
+            )}
+
             {/* Header ... no changes needed to header except maybe passing user */}
             <div className="dashboard-header">
                 <div className="d-flex align-items-center">
@@ -917,7 +975,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                                 <li className="d-flex align-items-center"><i className="fas fa-check-circle text-success me-2"></i> View Monthly Collections & Forecasts</li>
                                 <li className="d-flex align-items-center"><i className="fas fa-check-circle text-success me-2"></i> Access Total Asset Value (AUM) Data</li>
                                 <li className="d-flex align-items-center"><i className="fas fa-check-circle text-success me-2"></i> Visual Subscriber Growth Charts</li>
-                                <li className="d-flex align-items-center"><i className="fas fa-check-circle text-success me-2"></i> Create <strong>Unlimited</strong> Chit Plans</li>
+                                <li className="d-flex align-items-center"><i className="fas fa-check-circle text-success me-2"></i> Create <strong className='mx-1'>upto 6</strong> Chit Plans</li>
                                 <li className="d-flex align-items-center"><i className="fas fa-check-circle text-success me-2"></i> Priority Support</li>
                             </ul>
                             <div className="d-grid gap-2">

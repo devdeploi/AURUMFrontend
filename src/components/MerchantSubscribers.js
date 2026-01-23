@@ -401,40 +401,57 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                                             )}
                                         </td>
                                         <td>
-                                            <Button
-                                                size="sm"
-                                                className="me-2 btn-outline-brand"
-                                                onClick={() => openHistoryModal(item)}
-                                                title="View History"
-                                            >
-                                                <i className="fas fa-history me-1"></i><span>History</span>
-                                            </Button>
-                                            <Button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                disabled={remainingBalance <= 0}
-                                                onClick={() => openManualPaymentModal(item)}
-                                                style={{
-                                                    borderColor: '#915200',
-                                                    color: '#915200',
-                                                    ...(remainingBalance <= 0 ? { opacity: 0.5, borderColor: '#ccc', color: '#ccc' } : {})
-                                                }}
-                                                onMouseOver={(e) => {
-                                                    if (remainingBalance > 0) {
-                                                        e.target.style.backgroundColor = '#915200';
-                                                        e.target.style.color = '#fff';
-                                                    }
-                                                }}
-                                                onMouseOut={(e) => {
-                                                    if (remainingBalance > 0) {
-                                                        e.target.style.backgroundColor = 'transparent';
-                                                        e.target.style.color = '#915200';
-                                                    }
-                                                }}
-                                            >
-                                                Paid Offline
-                                            </Button>
+                                            <div className="d-flex align-items-center gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => openHistoryModal(item)}
+                                                    title="View History"
+                                                    style={{
+                                                        border: '1px solid #915200',
+                                                        color: '#915200',
+                                                        backgroundColor: 'transparent'
+                                                    }}
+                                                    onMouseOver={(e) => {
+                                                        e.currentTarget.style.backgroundColor = '#915200';
+                                                        e.currentTarget.style.color = '#fff';
+                                                    }}
+                                                    onMouseOut={(e) => {
+                                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                                        e.currentTarget.style.color = '#915200';
+                                                    }}
+                                                >
+                                                    <i className="fas fa-history"></i>
+                                                </Button>
+
+                                                <Button
+                                                    size="sm"
+                                                    disabled={remainingBalance <= 0}
+                                                    onClick={() => openManualPaymentModal(item)}
+                                                    title="Paid Offline"
+                                                    style={{
+                                                        border: '1px solid #915200',
+                                                        color: remainingBalance <= 0 ? '#ccc' : '#915200',
+                                                        backgroundColor: 'transparent',
+                                                        opacity: remainingBalance <= 0 ? 0.5 : 1
+                                                    }}
+                                                    onMouseOver={(e) => {
+                                                        if (remainingBalance > 0) {
+                                                            e.currentTarget.style.backgroundColor = '#915200';
+                                                            e.currentTarget.style.color = '#fff';
+                                                        }
+                                                    }}
+                                                    onMouseOut={(e) => {
+                                                        if (remainingBalance > 0) {
+                                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                                            e.currentTarget.style.color = '#915200';
+                                                        }
+                                                    }}
+                                                >
+                                                    <i className="fas fa-hand-holding-usd"></i>
+                                                </Button>
+                                            </div>
                                         </td>
+
                                     </tr>
                                 );
                             })}
@@ -482,7 +499,7 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                 <Modal.Header closeButton style={{ borderBottom: '2px solid #f3e9bd', backgroundColor: '#fffbf0' }}>
                     <Modal.Title className="d-flex align-items-center" style={{ color: '#915200' }}>
                         <i className="fas fa-money-bill-wave me-2"></i>
-                        Record Manual Payment
+                        Record Offline Payment
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ padding: '2rem' }}>

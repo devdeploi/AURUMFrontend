@@ -215,7 +215,9 @@ const ManageChits = () => {
             rzp1.on('payment.failed', function (response) {
                 alert(response.error.description);
             });
-            rzp1.open();
+            setTimeout(() => {
+                rzp1.open();
+            }, 2000);
 
         } catch (error) {
             console.error(error);
@@ -300,13 +302,70 @@ const ManageChits = () => {
                     <div className="d-flex gap-2">
                         {!isPremium && (
                             <Button
-                                variant="warning"
-                                className="fw-bold rounded-pill"
-                                style={{ color: '#fff', borderColor: '#ffc107' }}
                                 onClick={handleUpgradeClick}
+                                className="fw-bold rounded-pill d-flex align-items-center gap-2 px-4 position-relative overflow-hidden"
+                                style={{
+                                    background: `
+            linear-gradient(
+                145deg,
+                #915200 0%,
+                #a86400 35%,
+                #c07a00 50%,
+                #a86400 65%,
+                #915200 100%
+            )
+        `,
+                                    color: '#ffffff',
+                                    border: '1px solid rgba(145, 82, 0, 0.65)',
+                                    boxShadow: `
+            0 10px 28px rgba(145, 82, 0, 0.45),
+            inset 0 1px 1px rgba(255,255,255,0.35),
+            inset 0 -2px 6px rgba(0,0,0,0.25)
+        `,
+                                    transition: 'transform 0.3s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }}
                             >
-                                <i className="fas fa-crown me-2"></i>Go Premium
+                                {/* 🔥 Animated Glass Shine */}
+                                <span
+                                    className="glass-shine"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '-60%',
+                                        left: '-70%',
+                                        width: '50%',
+                                        height: '220%',
+                                        background:
+                                            'linear-gradient(120deg, rgba(255,255,255,0.45), rgba(255,255,255,0))',
+                                        transform: 'rotate(25deg)',
+                                        pointerEvents: 'none',
+                                        animation: 'none'
+                                    }}
+                                    ref={(el) => {
+                                        if (!el) return;
+
+                                        // Restart shine animation every second
+                                        setInterval(() => {
+                                            el.style.transition = 'none';
+                                            el.style.left = '-70%';
+
+                                            requestAnimationFrame(() => {
+                                                el.style.transition = 'left 0.8s ease-in-out';
+                                                el.style.left = '120%';
+                                            });
+                                        }, 3000);
+                                    }}
+                                />
+
+                                <i className="fas fa-crown"></i>
+                                Go Premium
                             </Button>
+
                         )}
                         <Button
                             style={{ background: 'linear-gradient(90deg, #ebdc87 0%, #e2d183 100%)', borderColor: '#915200', color: '#915200' }}

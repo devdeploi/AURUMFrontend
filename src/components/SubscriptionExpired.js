@@ -274,9 +274,11 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                                         <h5 className="fw-bold text-dark">Standard Plan</h5>
                                         <h4 className="my-3 text-secondary fw-bold">1500/mon</h4>
                                         <ul className="list-unstyled text-start small text-muted mx-auto" style={{ maxWidth: '200px' }}>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Up to 3 Chit Plans</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Basic Analytics</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Standard Support</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>3 Chits Only</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Normal Dashboard</li>
+                                            <li className="mb-2"><i className="fas fa-times text-danger me-2"></i>No Shop Image Uploads</li>
+                                            <li className="mb-2"><i className="fas fa-exclamation-triangle text-warning me-2"></i>Screen Blocking Ads</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Email Support</li>
                                         </ul>
                                         {/* Show warning if checking would trigger downgrade flow */}
                                         {isStandardRestricted && (
@@ -308,8 +310,10 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                                         <h4 className="my-3 text-warning fw-bold">5000/mon</h4>
                                         <ul className="list-unstyled text-start small text-muted mx-auto" style={{ maxWidth: '200px' }}>
                                             <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Up to 6 Chits</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Advanced Analytics</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Priority Support</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Advanced Dashboard</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Unlimited Shop Images</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>No Screen Blocking Ads</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>24/7 Support</li>
                                         </ul>
                                     </div>
                                 </div>

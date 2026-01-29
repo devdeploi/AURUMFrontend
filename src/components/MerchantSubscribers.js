@@ -987,7 +987,7 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                                 <textarea
                                     className="form-control"
                                     rows="3"
-                                    placeholder="E.g. Paid in cash at shop, Bank transfer, Cheque #12345..."
+                                    placeholder="E.g. Paid in cash at shop, Bank transfer..."
                                     value={manualForm.notes}
                                     onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })}
                                     style={{ borderColor: '#915200' }}

@@ -6,9 +6,6 @@ import useAutoLogout from './hooks/useAutoLogout';
 import Dashboard from './components/Dashboard'; // Admin Dashboard
 import MerchantDashboard from './components/MerchantDashboard';
 import MerchantRegister from './components/MerchantRegister';
-
-import UserDashboard from './components/UserDashboard';
-
 import LandingPage from './components/LandingPage';
 import TermsOfService from './components/TermsOfService';
 import PrivacyPolicy from './components/PrivacyPolicy';
@@ -16,18 +13,18 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 // Protected Route Component
 const ProtectedRoute = ({ userRole, allowedRole, children }) => {
   if (!userRole) {
-    return <Navigate to="/aurum/login" replace />; // Redirect unauthenticated users to login
+    return <Navigate to="/aurum/login" replace />;
   }
-  // Allow if role matches OR if allowedRole is array/generic (simplified here)
+
   if (allowedRole && userRole !== allowedRole) {
-    // If user tries to access merchant/admin, redirect to their home
     if (userRole === 'admin') return <Navigate to="/admin-dashboard" replace />;
     if (userRole === 'merchant') return <Navigate to="/merchant-dashboard" replace />;
-    if (userRole === 'user') return <Navigate to="/user-dashboard" replace />;
     return <Navigate to="/" replace />;
   }
+
   return children;
 };
+
 // Wrappers to handle navigation logic inside Router context
 const LoginWrapper = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -58,6 +55,10 @@ function App() {
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
+        if (user.role === 'user') {
+          localStorage.removeItem('user');
+          return;
+        }
         const role = user.role || (user.plan ? 'merchant' : 'user'); // Fallback if role missing
         handleLogin(role, user);
       } catch (e) {
@@ -83,7 +84,7 @@ function App() {
   };
 
   console.log("current user", currentUser);
-  
+
 
   useAutoLogout(handleLogout, 10 * 60 * 1000, !!userRole); // 5 minutes
 
@@ -103,14 +104,18 @@ function App() {
               ) : (
                 <Navigate
                   to={
-                    userRole === 'admin' ? '/admin-dashboard' :
-                      userRole === 'merchant' ? '/merchant-dashboard' : '/user-dashboard'
+                    userRole === 'admin'
+                      ? '/admin-dashboard'
+                      : userRole === 'merchant'
+                        ? '/merchant-dashboard'
+                        : '/'
                   }
                   replace
                 />
               )
             }
           />
+
           <Route
             path="/register"
             element={
@@ -140,14 +145,7 @@ function App() {
             }
           />
 
-          <Route
-            path="/user-dashboard"
-            element={
-              <ProtectedRoute userRole={userRole} allowedRole="user">
-                <UserDashboard user={currentUser} onLogout={handleLogout} />
-              </ProtectedRoute>
-            }
-          />
+
 
           {/* Fallback for unknown routes */}
           <Route path="*" element={<Navigate to="/" replace />} />

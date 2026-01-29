@@ -82,6 +82,10 @@ const Login = ({ onLogin, onRegisterClick }) => {
             // Try User/Admin Login first
             try {
                 const { data } = await axios.post(`${APIURL}/users/login`, { email, password });
+                if (data.role === 'user') {
+                    setError('Users cannot login on the web app. Please login using the Aurum mobile app.');
+                    return;
+                }
                 localStorage.setItem('user', JSON.stringify(data));
                 onLogin(data.role, data);
             } catch (err) {

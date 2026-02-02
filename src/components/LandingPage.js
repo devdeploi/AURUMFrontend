@@ -66,7 +66,7 @@ const LandingPage = () => {
         },
         {
             name: 'Premium',
-            price: billingCycle === 'yearly' ? '₹50,000' : '₹5000',
+            price: billingCycle === 'yearly' ? '₹25,000' : '₹2,500',
             period: billingCycle === 'yearly' ? '/yr' : '/mo',
             features: [
                 'Up to 6 Chits',
@@ -76,7 +76,7 @@ const LandingPage = () => {
                 '24/7 Support'
             ],
             recommended: true,
-            savings: billingCycle === 'yearly' ? 'Save ₹10,000/yr' : ''
+            savings: billingCycle === 'yearly' ? 'Save ₹5,000/yr' : ''
         }
     ];
 

@@ -35,6 +35,7 @@ const MerchantList = ({ mode = 'admin' }) => {
             let query = `${APIURL}/merchants?page=${page}&limit=10`;
             console.log(query);
 
+            const config = mode === 'admin' ? getAuthConfig() : {};
 
             // Force approved for public
             if (mode === 'public') {
@@ -49,7 +50,7 @@ const MerchantList = ({ mode = 'admin' }) => {
 
             if (search) query += `&keyword=${search}`;
 
-            const response = await axios.get(query);
+            const response = await axios.get(query, config);
             console.log(response);
 
             setMerchantsList(response.data.merchants);
@@ -150,7 +151,7 @@ const MerchantList = ({ mode = 'admin' }) => {
     return (
         <div className="custom-table-container">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h5 className="fw-semibold mb-0" style={{color:"#915200"}}>
+                <h5 className="fw-semibold mb-0" style={{ color: "#915200" }}>
                     <i className="fas fa-store me-2"></i>
                     Merchant Directory
                 </h5>

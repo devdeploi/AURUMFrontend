@@ -12,7 +12,6 @@ import { APIURL } from '../utils/Function';
 import SchoolHubAd from './ads/SchoolHubAd';
 import QuickproAd from './ads/QuickproAd';
 
-// ... existing imports ...
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -100,13 +99,13 @@ const MerchantDashboard = ({ user, onLogout }) => {
                     setSelectedAd(Math.random() > 0.5 ? 'quickpro' : 'schoolhub');
                     setShowAd(true);
                 }
-            }, 60000); // Every 60 seconds
+            }, 900000); // Every 15 minutes
 
             return () => clearInterval(interval);
-        }, 60000);
+        }, 900000);
 
         return () => clearTimeout(initialTimeout);
-    }, []); // Run once on mount
+    }, [blockingRenewal, showRenewalModal]); // Run once on mount
 
     // Fetch latest profile on mount
     useEffect(() => {

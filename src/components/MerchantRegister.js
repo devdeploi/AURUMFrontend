@@ -97,6 +97,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
     });
 
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -145,8 +146,8 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
         },
         {
             name: 'Premium',
-            price: formData.billingCycle === 'yearly' ? '₹50,000/yr' : '₹5000/mo',
-            amount: formData.billingCycle === 'yearly' ? 50000 : 5000,
+            price: formData.billingCycle === 'yearly' ? '₹25,000/yr' : '₹2,500/mo',
+            amount: formData.billingCycle === 'yearly' ? 25000 : 2500,
             features: [
                 'Up to 6 Chits',
                 'Advanced Dashboard',
@@ -155,7 +156,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                 '24/7 Support'
             ],
             color: 'secondary',
-            savings: formData.billingCycle === 'yearly' ? 'Save ₹10,000/yr' : ''
+            savings: formData.billingCycle === 'yearly' ? 'Save ₹5,000/yr' : ''
         }
     ];
 
@@ -217,23 +218,37 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        // Validation for file type (client-side double check)
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only JPG and PNG files are allowed');
+            return;
+        }
+
         const formDataUpload = new FormData();
         formDataUpload.append('image', file);
         setUploading(true);
+        setUploadProgress(0);
 
         try {
             const config = {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
             };
             const { data } = await axios.post(`${APIURL}/upload`, formDataUpload, config);
             setFormData(prev => ({ ...prev, addressProof: data }));
         } catch (error) {
             console.error(error);
-            alert('File upload failed');
+            alert('File upload failed. Please try again.');
         } finally {
             setUploading(false);
+            // Don't reset progress immediately so user sees 100% briefly, or handle in UI
+            setTimeout(() => setUploadProgress(0), 1000);
         }
     };
 
@@ -1099,9 +1114,12 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                                             style={{ cursor: 'pointer' }}
                                                         />
                                                         {uploading ? (
-                                                            <div className="d-flex align-items-center justify-content-center small text-muted">
-                                                                <Spinner animation="border" size="sm" className="me-2" />
-                                                                Uploading...
+                                                            <div className="w-100 px-3">
+                                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                                    <small className="text-muted">Uploading...</small>
+                                                                    <small className="fw-bold" style={{ color: brandColor }}>{uploadProgress}%</small>
+                                                                </div>
+                                                                <ProgressBar now={uploadProgress} striped animated variant="warning" size="sm" style={{ height: '6px' }} />
                                                             </div>
                                                         ) : (
                                                             <div className="d-flex align-items-center justify-content-center gap-2">

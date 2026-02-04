@@ -46,7 +46,12 @@ ChartJS.register(
 
 const MerchantDashboard = ({ user, onLogout }) => {
     const [activeTab, setActiveTab] = useState('overview');
-    const [goldRates, setGoldRates] = useState({ buy: 0, sell: 0, loading: true });
+    const [goldRates, setGoldRates] = useState({
+        buy24: 0, sell24: 0,
+        buy22: 0, sell22: 0,
+        buy18: 0, sell18: 0,
+        loading: true
+    });
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     // Extended stats for charts and premium cards
     const [stats, setStats] = useState({
@@ -317,12 +322,22 @@ const MerchantDashboard = ({ user, onLogout }) => {
                 const chennaiAdjusted = pricePerGram24K * 1.01;
 
                 // Buy / Sell spread
-                const buyPrice = chennaiAdjusted * 1.03;
-                const sellPrice = chennaiAdjusted * 0.97;
+                const buyPrice24 = chennaiAdjusted * 1.03;
+                const sellPrice24 = chennaiAdjusted * 0.97;
+
+                const buyPrice22 = buyPrice24 * (22 / 24);
+                const sellPrice22 = sellPrice24 * (22 / 24);
+
+                const buyPrice18 = buyPrice24 * (18 / 24);
+                const sellPrice18 = sellPrice24 * (18 / 24);
 
                 setGoldRates({
-                    buy: buyPrice.toFixed(2),
-                    sell: sellPrice.toFixed(2),
+                    buy24: buyPrice24.toFixed(2),
+                    sell24: sellPrice24.toFixed(2),
+                    buy22: buyPrice22.toFixed(2),
+                    sell22: sellPrice22.toFixed(2),
+                    buy18: buyPrice18.toFixed(2),
+                    sell18: sellPrice18.toFixed(2),
                     loading: false
                 });
 
@@ -439,6 +454,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
     ];
 
     const isPremium = merchantData.plan === 'Premium';
+    const isBasic = merchantData.plan === 'Basic' || !merchantData.plan;
 
     // -- Helper Components --
 
@@ -542,6 +558,334 @@ const MerchantDashboard = ({ user, onLogout }) => {
                         </div>
 
 
+                        {/* Premium Gold Rates Card with Shimmer Effects */}
+                        <style>{`
+                            @keyframes shimmer {
+                                0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+                                100% { transform: translateX(300%) translateY(300%) rotate(30deg); }
+                            }
+                            @keyframes goldPulse {
+                                0%, 100% { box-shadow: 0 0 20px rgba(145, 82, 0, 0.2), 0 10px 40px rgba(145, 82, 0, 0.15); }
+                                50% { box-shadow: 0 0 30px rgba(183, 121, 31, 0.3), 0 15px 50px rgba(183, 121, 31, 0.25); }
+                            }
+                            @keyframes shine {
+                                0% { background-position: -200% center; }
+                                100% { background-position: 200% center; }
+                            }
+                            @keyframes shimmerLoader {
+                                0% { background-position: -500px 0; }
+                                100% { background-position: 500px 0; }
+                            }
+                            .gold-card-shine {
+                                animation: goldPulse 3s ease-in-out infinite;
+                            }
+                            .gold-card-shine::before {
+                                content: '';
+                                position: absolute;
+                                top: -50%;
+                                left: -50%;
+                                width: 200%;
+                                height: 200%;
+                                background: linear-gradient(
+                                    45deg,
+                                    transparent 30%,
+                                    rgba(255, 255, 255, 0.6) 50%,
+                                    transparent 70%
+                                );
+                                animation: shimmer 3s infinite;
+                                pointer-events: none;
+                            }
+                            .price-shimmer {
+                                background: linear-gradient(
+                                    90deg,
+                                    #915200 0%,
+                                    #b7791f 25%,
+                                    #d4af37 50%,
+                                    #b7791f 75%,
+                                    #915200 100%
+                                );
+                                background-size: 200% auto;
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                background-clip: text;
+                                animation: shine 3s linear infinite;
+                            }
+                            .shimmer-loader {
+                                background: linear-gradient(
+                                    90deg,
+                                    #fef9e7 0px,
+                                    #fff 40px,
+                                    #fef9e7 80px
+                                );
+                                background-size: 500px;
+                                animation: shimmerLoader 1.5s infinite;
+                            }
+                            .live-pulse {
+                                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                            }
+                            @keyframes pulse {
+                                0%, 100% { opacity: 1; }
+                                50% { opacity: 0.5; }
+                            }
+                        `}</style>
+
+                        <div className="card border-0 rounded-4 mb-5 overflow-hidden position-relative gold-card-shine"
+                            style={{
+                                background: 'linear-gradient(145deg, #fef9e7 0%, #fff8dc 50%, #fffacd 100%)',
+                                border: '2px solid rgba(145, 82, 0, 0.2)',
+                                position: 'relative'
+                            }}>
+
+                            {/* Metallic Gold Overlay */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'radial-gradient(circle at 30% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 60%), radial-gradient(circle at 70% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 60%)',
+                                pointerEvents: 'none',
+                                zIndex: 1
+                            }}></div>
+
+                            {/* Content */}
+                            <div style={{ position: 'relative', zIndex: 2 }}>
+                                {/* Compact Header */}
+                                <div className="px-4 pt-3 pb-2">
+                                    <div className="d-flex align-items-center justify-content-between">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <div className="position-relative"
+                                                style={{
+                                                    width: '42px',
+                                                    height: '42px',
+                                                    background: 'linear-gradient(135deg, #d4af37 0%, #b7791f 50%, #915200 100%)',
+                                                    borderRadius: '10px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    boxShadow: '0 4px 15px rgba(145, 82, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4)'
+                                                }}>
+                                                <i className="fas fa-coins" style={{ color: '#fff', fontSize: '18px' }}></i>
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    inset: 0,
+                                                    borderRadius: '10px',
+                                                    background: 'linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)'
+                                                }}></div>
+                                            </div>
+                                            <div>
+                                                <h5 className="fw-bold mb-0" style={{
+                                                    color: '#915200',
+                                                    fontSize: '1.1rem',
+                                                    textShadow: '0 1px 3px rgba(145, 82, 0, 0.1)'
+                                                }}>
+                                                    Live Gold Rates
+                                                </h5>
+                                                {/* <p className="mb-0" style={{
+                                                    fontSize: '0.7rem',
+                                                    color: '#b7791f',
+                                                    letterSpacing: '0.5px'
+                                                }}>
+                                                    <i className="fas fa-map-marker-alt me-1" style={{ fontSize: '0.65rem' }}></i>
+                                                    CHENNAI MARKET
+                                                </p> */}
+                                            </div>
+                                        </div>
+                                        <div className="badge px-3 py-2 rounded-pill position-relative"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                                                color: '#fff',
+                                                fontSize: '0.65rem',
+                                                fontWeight: '700',
+                                                letterSpacing: '0.8px',
+                                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                boxShadow: '0 3px 10px rgba(220, 53, 69, 0.3)'
+                                            }}>
+                                            <span className="live-pulse d-inline-block rounded-circle me-2"
+                                                style={{
+                                                    width: '6px',
+                                                    height: '6px',
+                                                    background: '#ff4444',
+                                                    boxShadow: '0 0 8px #ff4444'
+                                                }}></span>
+                                            LIVE
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Compact Gold Rates Grid */}
+                                <div className="px-4 pb-4 pt-2">
+                                    <div className="row g-3">
+                                        {/* 24K */}
+                                        <div className="col-4">
+                                            <div className="text-center p-3 rounded-3 position-relative overflow-hidden"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 248, 220, 0.5) 100%)',
+                                                    border: '1.5px solid rgba(145, 82, 0, 0.2)',
+                                                    backdropFilter: 'blur(10px)',
+                                                    boxShadow: '0 2px 8px rgba(145, 82, 0, 0.08)'
+                                                }}>
+                                                <div className="badge px-2 py-1 rounded-pill mb-2"
+                                                    style={{
+                                                        background: 'rgba(145, 82, 0, 0.1)',
+                                                        color: '#915200',
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: '600',
+                                                        border: '1px solid rgba(145, 82, 0, 0.15)'
+                                                    }}>
+                                                    24K
+                                                </div>
+                                                {goldRates.loading ? (
+                                                    <div>
+                                                        <div className="shimmer-loader rounded mb-2 mx-auto"
+                                                            style={{ height: '32px', width: '120px' }}></div>
+                                                        <div className="shimmer-loader rounded mx-auto"
+                                                            style={{ height: '12px', width: '40px' }}></div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <h3 className="fw-bold mb-0 price-shimmer"
+                                                            style={{
+                                                                fontSize: '1.75rem',
+                                                                letterSpacing: '-0.5px',
+                                                                textShadow: '0 2px 10px rgba(145, 82, 0, 0.15)'
+                                                            }}>
+                                                            ₹{goldRates.buy24}
+                                                        </h3>
+                                                        <small style={{
+                                                            color: '#b7791f',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: '600'
+                                                        }}>per gram</small>
+                                                    </>
+                                                )}
+                                                <div style={{
+                                                    fontSize: '0.65rem',
+                                                    marginTop: '4px',
+                                                    color: '#9CA3AF'
+                                                }}>
+                                                    99.9%
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* 22K */}
+                                        <div className="col-4">
+                                            <div className="text-center p-3 rounded-3 position-relative overflow-hidden"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 248, 220, 0.5) 100%)',
+                                                    border: '1.5px solid rgba(145, 82, 0, 0.2)',
+                                                    backdropFilter: 'blur(10px)',
+                                                    boxShadow: '0 2px 8px rgba(145, 82, 0, 0.08)'
+                                                }}>
+                                                <div className="badge px-2 py-1 rounded-pill mb-2"
+                                                    style={{
+                                                        background: 'rgba(145, 82, 0, 0.1)',
+                                                        color: '#915200',
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: '600',
+                                                        border: '1px solid rgba(145, 82, 0, 0.15)'
+                                                    }}>
+                                                    22K
+                                                </div>
+                                                {goldRates.loading ? (
+                                                    <div>
+                                                        <div className="shimmer-loader rounded mb-2 mx-auto"
+                                                            style={{ height: '32px', width: '120px' }}></div>
+                                                        <div className="shimmer-loader rounded mx-auto"
+                                                            style={{ height: '12px', width: '40px' }}></div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <h3 className="fw-bold mb-0 price-shimmer"
+                                                            style={{
+                                                                fontSize: '1.75rem',
+                                                                letterSpacing: '-0.5px',
+                                                                textShadow: '0 2px 10px rgba(145, 82, 0, 0.15)'
+                                                            }}>
+                                                            ₹{goldRates.buy22}
+                                                        </h3>
+                                                        <small style={{
+                                                            color: '#b7791f',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: '600'
+                                                        }}>per gram</small>
+                                                    </>
+                                                )}
+                                                <div style={{
+                                                    fontSize: '0.65rem',
+                                                    marginTop: '4px',
+                                                    color: '#9CA3AF'
+                                                }}>
+                                                    91.6%
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* 18K */}
+                                        <div className="col-4">
+                                            <div className="text-center p-3 rounded-3 position-relative overflow-hidden"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 248, 220, 0.5) 100%)',
+                                                    border: '1.5px solid rgba(145, 82, 0, 0.2)',
+                                                    backdropFilter: 'blur(10px)',
+                                                    boxShadow: '0 2px 8px rgba(145, 82, 0, 0.08)'
+                                                }}>
+                                                <div className="badge px-2 py-1 rounded-pill mb-2"
+                                                    style={{
+                                                        background: 'rgba(145, 82, 0, 0.1)',
+                                                        color: '#915200',
+                                                        fontSize: '0.7rem',
+                                                        fontWeight: '600',
+                                                        border: '1px solid rgba(145, 82, 0, 0.15)'
+                                                    }}>
+                                                    18K
+                                                </div>
+                                                {goldRates.loading ? (
+                                                    <div>
+                                                        <div className="shimmer-loader rounded mb-2 mx-auto"
+                                                            style={{ height: '32px', width: '120px' }}></div>
+                                                        <div className="shimmer-loader rounded mx-auto"
+                                                            style={{ height: '12px', width: '40px' }}></div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <h3 className="fw-bold mb-0 price-shimmer"
+                                                            style={{
+                                                                fontSize: '1.75rem',
+                                                                letterSpacing: '-0.5px',
+                                                                textShadow: '0 2px 10px rgba(145, 82, 0, 0.15)'
+                                                            }}>
+                                                            ₹{goldRates.buy18}
+                                                        </h3>
+                                                        <small style={{
+                                                            color: '#b7791f',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: '600'
+                                                        }}>per gram</small>
+                                                    </>
+                                                )}
+                                                <div style={{
+                                                    fontSize: '0.65rem',
+                                                    marginTop: '4px',
+                                                    color: '#9CA3AF'
+                                                }}>
+                                                    75%
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bottom Gold Bar Accent */}
+                            <div style={{
+                                height: '4px',
+                                background: 'linear-gradient(90deg, transparent 0%, #d4af37 50%, transparent 100%)',
+                                boxShadow: '0 0 15px rgba(212, 175, 55, 0.5)'
+                            }}></div>
+                        </div>
+
                         {/* KEY METRICS (Stock Ticker Style) */}
                         <div className="row g-4 mb-5">
                             <StatCard
@@ -562,7 +906,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                                 subtext="Total Scheme Value"
                                 icon="fa-wallet"
                                 color="warning"
-                                isLocked={!isPremium}
+                                isLocked={isBasic}
                             />
                             <StatCard
                                 title="Outstanding Dues"
@@ -570,7 +914,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                                 subtext="Action Required"
                                 icon="fa-exclamation-circle"
                                 color="danger"
-                                isLocked={!isPremium}
+                                isLocked={isBasic}
                             />
                         </div>
 
@@ -610,7 +954,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                                             }}
                                         />}
                                     </div>
-                                    {!isPremium && <PremiumLockOverlay />}
+                                    {isBasic && <PremiumLockOverlay />}
                                 </div>
                             </div>
 
@@ -636,7 +980,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                                             }}
                                         />}
                                     </div>
-                                    {!isPremium && <PremiumLockOverlay />}
+                                    {isBasic && <PremiumLockOverlay />}
                                 </div>
                             </div>
                         </div>
@@ -756,7 +1100,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                                     }
                                 </div>
                             </div>
-                            {!isPremium && <PremiumLockOverlay />}
+                            {isBasic && <PremiumLockOverlay />}
                         </div>
                     </div>
                 );
@@ -780,17 +1124,16 @@ const MerchantDashboard = ({ user, onLogout }) => {
                     <SchoolHubAd
                         visible={showAd && selectedAd === 'schoolhub'}
                         onClose={() => setShowAd(false)}
-                        variant={isPremium ? 'banner' : 'full'}
+                        variant={merchantData?.plan === 'Basic' ? 'full' : 'banner'}
                     />
                     <QuickproAd
                         visible={showAd && selectedAd === 'quickpro'}
                         onClose={() => setShowAd(false)}
-                        variant={isPremium ? 'banner' : 'full'}
+                        variant={merchantData?.plan === 'Basic' ? 'full' : 'banner'}
                     />
                 </>
             )}
 
-            {/* Header ... no changes needed to header except maybe passing user */}
             <div className="dashboard-header">
                 <div className="d-flex align-items-center">
                     <img src="/images/AURUM.png" alt="Logo" className="me-2" style={{ height: '60px' }} />
@@ -806,108 +1149,7 @@ const MerchantDashboard = ({ user, onLogout }) => {
                     >
                         AURUM
                     </h2>
-                    <div
-                        className="d-none d-lg-flex align-items-center rounded-pill px-3 py-0 shadow-lg"
-                        style={{
-                            background:
-                                "linear-gradient(225deg, #FFF4CC 0%, #E6C866 40%, #C9A441 75%, #A67C00 100%)",
-                            border: "1px solid rgba(90,62,18,0.35)",
-                            minWidth: "280px",
-                        }}
-                    >
-                        {/* Premium Coin */}
-                        <div
-                            className="d-flex align-items-center justify-content-center me-3"
-                            style={{
-                                width: "35px",
-                                height: "35px",
-                                borderRadius: "50%",
-                                background:
-                                    "radial-gradient(circle at 30% 30%, #FFF4CC, #C9A441 60%, #A67C00)",
-                                boxShadow:
-                                    "inset 0 2px 4px rgba(255,255,255,0.6), 0 6px 14px rgba(201,164,65,0.6)",
-                                border: "1px solid rgba(90,62,18,0.4)",
-                            }}
-                        >
-                            <i
-                                className="fas fa-coins"
-                                style={{
-                                    fontSize: "1.1rem",
-                                    color: "#5A3E12",
-                                    textShadow: "0 1px 1px rgba(255,255,255,0.5)",
-                                }}
-                            />
-                        </div>
 
-                        {/* Buy Price */}
-                        <div className="d-flex flex-column lh-1 me-4">
-                            <span
-                                className="fw-semibold text-uppercase"
-                                style={{
-                                    fontSize: "0.65rem",
-                                    letterSpacing: "1.4px",
-                                    color: "#6F4E16",
-                                }}
-                            >
-                                24K Gold Buy
-                            </span>
-
-                            {goldRates.loading ? (
-                                <span className="spinner-border spinner-border-sm text-dark mt-1"></span>
-                            ) : (
-                                <div className="d-flex align-items-end mt-1">
-                                    <span
-                                        className="fw-bold"
-                                        style={{
-                                            fontSize: "1.35rem",
-                                            color: "#5A3E12",
-                                            letterSpacing: "-0.3px",
-                                        }}
-                                    >
-                                        ₹{goldRates.buy}
-                                    </span>
-                                    <span
-                                        style={{
-                                            fontSize: "0.75rem",
-                                            marginLeft: "4px",
-                                            color: "#6F4E16",
-                                        }}
-                                    >
-                                        /gm
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Sell Price */}
-                        {!goldRates.loading && (
-                            <div
-                                className="ps-3"
-                                style={{
-                                    borderLeft: "1px solid rgba(90,62,18,0.35)",
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        fontSize: "0.6rem",
-                                        letterSpacing: "1.3px",
-                                        color: "#6F4E16",
-                                    }}
-                                >
-                                    SELL
-                                </span>
-                                <span
-                                    className="fw-semibold d-block"
-                                    style={{
-                                        fontSize: "0.9rem",
-                                        color: "#5A3E12",
-                                    }}
-                                >
-                                    ₹{goldRates.sell}
-                                </span>
-                            </div>
-                        )}
-                    </div>
                 </div>
 
                 <Button
@@ -1000,8 +1242,9 @@ const MerchantDashboard = ({ user, onLogout }) => {
             {/* Mobile ticker if needed */}
             <div className="d-lg-none bg-light p-2 text-center border-bottom">
                 <span className="text-secondary small fw-bold me-2">GOLD (24k):</span>
-                <Badge className="me-2 text-white" style={{ background: 'linear-gradient(to right, #4b0082, #00008b)' }}>Buy: ₹{goldRates.buy || '...'}</Badge>
-                <Badge className="text-white" style={{ background: 'linear-gradient(to right, #4b0082, #00008b)' }}>Sell: ₹{goldRates.sell || '...'}</Badge>
+                <Badge className="me-2 text-white" style={{ background: 'linear-gradient(to right, #4b0082, #00008b)' }}>24K: ₹{goldRates.buy24 || '...'}</Badge>
+                <Badge className="me-2 text-white" style={{ background: 'linear-gradient(to right, #4b0082, #00008b)' }}>22K: ₹{goldRates.buy22 || '...'}</Badge>
+                <Badge className="text-white" style={{ background: 'linear-gradient(to right, #4b0082, #00008b)' }}>18K: ₹{goldRates.buy18 || '...'}</Badge>
             </div>
 
             <div className="dashboard-content">

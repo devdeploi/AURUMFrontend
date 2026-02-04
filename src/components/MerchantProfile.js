@@ -207,7 +207,7 @@ const MerchantProfile = ({ merchantData }) => {
     const handleUpgradePayment = async () => {
         try {
             // 1. Create Order
-            const amount = merchantUpgradeCycle === 'yearly' ? 50000 : 5000;
+            const amount = merchantUpgradeCycle === 'yearly' ? 41300 : 4130; // 35000 + 18% GST
             const { data: order } = await axios.post(`${APIURL}/payments/create-subscription-order`, {
                 amount: amount // Premium Plan Price
             });
@@ -329,7 +329,7 @@ const MerchantProfile = ({ merchantData }) => {
 
     const processDowngrade = async () => {
         try {
-            // Initiate standard payment logic (1500 INR)
+            // Initiate standard payment logic (1770 INR = 1500 + 18%)
             const { data: order } = await axios.post(`${APIURL}/merchants/create-renewal-order`, {
                 plan: 'Standard'
             }); // Note: Using existing renewal endpoint to create order for Standard
@@ -904,7 +904,7 @@ const MerchantProfile = ({ merchantData }) => {
 
                                 {isEditing && (
                                     <>
-                                        {data.plan === 'Premium' ? (
+                                        {data.plan !== 'Basic' ? (
                                             <Form.Control
                                                 type="file"
                                                 onChange={uploadFileHandler}
@@ -1107,11 +1107,11 @@ const MerchantProfile = ({ merchantData }) => {
                                 <img src="/images/AURUM.png" alt="Logo" className="mb-3" style={{ height: '60px' }} />
                                 <h3 className="fw-bold">Premium Benefits</h3>
                                 <ul className="list-unstyled text-start mx-auto mt-3" style={{ maxWidth: '300px' }}>
-                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Up to 6 Chits</li>
-                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Advanced Dashboard</li>
-                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Unlimited Shop Images</li>
-                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>No Screen Blocking Ads</li>
-                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>24/7 Support</li>
+                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>iOS App Access</li>
+                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>9 Chit Plan</li>
+                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Custom Ads</li>
+                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Payment Filter (Date)</li>
+                                    <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Priority Support</li>
                                 </ul>
                                 <hr />
                                 <div className="d-flex justify-content-center gap-2 mb-3 mt-4">
@@ -1129,12 +1129,12 @@ const MerchantProfile = ({ merchantData }) => {
                                         className="fw-bold rounded-pill"
                                         onClick={() => setMerchantUpgradeCycle('yearly')}
                                     >
-                                        Yearly (Save ₹10,000)
+                                        Yearly (Save ₹7,000)
                                     </Button>
                                 </div>
                                 <div className="display-6 fw-bold text-success">
-                                    {merchantUpgradeCycle === 'yearly' ? '₹50,000' : '₹5,000'}
-                                    <span className="fs-6 text-muted">/{merchantUpgradeCycle === 'yearly' ? 'year' : 'month'}</span>
+                                    {merchantUpgradeCycle === 'yearly' ? '₹41,300' : '₹4,130'}
+                                    <span className="fs-6 text-muted">/{merchantUpgradeCycle === 'yearly' ? 'year' : 'month'} <span className="text-danger small">(Incl. 18% GST)</span></span>
                                 </div>
                             </div>
                         </div>
@@ -1215,7 +1215,7 @@ const MerchantProfile = ({ merchantData }) => {
                                 disabled={currentChitCount > standardLimit}
                                 onClick={processDowngrade}
                             >
-                                {currentChitCount <= standardLimit ? 'Pay & Downgrade (₹1500)' : `Delete ${currentChitCount - standardLimit} More`}
+                                {currentChitCount <= standardLimit ? 'Pay & Downgrade (₹1,770)' : `Delete ${currentChitCount - standardLimit} More`}
                             </Button>
                         </div>
                     </div>

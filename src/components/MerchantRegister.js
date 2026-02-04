@@ -131,9 +131,9 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
     const plans = [
         {
-            name: 'Standard',
-            price: formData.billingCycle === 'yearly' ? '₹15,000/yr' : '₹1500/mo',
-            amount: formData.billingCycle === 'yearly' ? 15000 : 1500,
+            name: 'Basic',
+            price: formData.billingCycle === 'yearly' ? '₹15,000/yr + 18% GST' : '₹1,500/mo + 18% GST',
+            amount: formData.billingCycle === 'yearly' ? 17700 : 1770,
             features: [
                 '3 Chits Only',
                 'Normal Dashboard',
@@ -145,9 +145,9 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
             savings: formData.billingCycle === 'yearly' ? 'Save ₹3,000/yr' : ''
         },
         {
-            name: 'Premium',
-            price: formData.billingCycle === 'yearly' ? '₹25,000/yr' : '₹2,500/mo',
-            amount: formData.billingCycle === 'yearly' ? 25000 : 2500,
+            name: 'Standard',
+            price: formData.billingCycle === 'yearly' ? '₹25,000/yr + 18% GST' : '₹2,500/mo + 18% GST',
+            amount: formData.billingCycle === 'yearly' ? 29500 : 2950,
             features: [
                 'Up to 6 Chits',
                 'Advanced Dashboard',
@@ -155,8 +155,22 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                 'No Screen Blocking Ads',
                 '24/7 Support'
             ],
-            color: 'secondary',
+            color: 'primary',
             savings: formData.billingCycle === 'yearly' ? 'Save ₹5,000/yr' : ''
+        },
+        {
+            name: 'Premium',
+            price: formData.billingCycle === 'yearly' ? '₹35,000/yr + 18% GST' : '₹3,500/mo + 18% GST',
+            amount: formData.billingCycle === 'yearly' ? 41300 : 4130,
+            features: [
+                'iOS App Access',
+                '9 Chit Plan',
+                'Custom Ads',
+                'Payment Filter (Date)',
+                'Priority Support'
+            ],
+            color: 'warning',
+            savings: formData.billingCycle === 'yearly' ? 'Save ₹7,000/yr' : ''
         }
     ];
 
@@ -503,7 +517,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
     return (
         <PageLayout onSwitchToLogin={onSwitchToLogin}>
-            <Card className="shadow border-0" style={{ maxWidth: step === 2 ? '1100px' : '750px', width: '100%', borderRadius: '12px', overflow: 'hidden', transition: 'max-width 0.3s ease' }}>
+            <Card className="shadow border-0" style={{ maxWidth: (step === 2 || step === 1) ? '1100px' : '750px', width: '100%', borderRadius: '12px', overflow: 'hidden', transition: 'max-width 0.3s ease' }}>
                 <div className="p-3 p-md-4">
                     {step > 0 && (
                         <div className="text-center mb-3">
@@ -787,7 +801,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
                             <Row className="g-3">
                                 {plans.map((plan, index) => (
-                                    <Col md={6} key={plan.name}>
+                                    <Col md={4} sm={12} key={plan.name}>
                                         <div
                                             className={`plan-card p-3 rounded-3 border h-100 d-flex flex-column ${formData.plan === plan.name ? 'selected' : ''}`}
                                             style={{
@@ -831,7 +845,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                                             background: `linear-gradient(135deg, ${brandColor}15, ${goldColor}15)`,
                                                             border: `2px solid ${formData.plan === plan.name ? brandColor : '#e9ecef'}`
                                                         }}>
-                                                        <i className={`fas ${plan.name === 'Premium' ? 'fa-crown' : 'fa-gem'}`}
+                                                        <i className={`fas ${plan.name === 'Premium' ? 'fa-crown' : plan.name === 'Standard' ? 'fa-cube' : 'fa-leaf'}`}
                                                             style={{
                                                                 color: formData.plan === plan.name ? brandColor : '#6c757d',
                                                                 fontSize: '1.2rem'

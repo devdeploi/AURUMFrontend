@@ -21,11 +21,6 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
     const [myChits, setMyChits] = useState([]);
     const [loadingChits, setLoadingChits] = useState(false);
 
-    // Standard Limit Logic
-    // If expired, we don't disable the button visually, but intercept the click if count > 3 for Standard
-    const standardLimit = 3;
-    const isStandardRestricted = existingPlanCount > standardLimit;
-
     const fetchChits = async () => {
         setLoadingChits(true);
         try {
@@ -58,12 +53,28 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
     // Derived count from local state if modal is open to reflect real-time deletions
     const currentChitCount = showDowngradeModal ? myChits.length : existingPlanCount;
 
+    // Limit Logic
+    const basicLimit = 3;
+    const standardLimit = 6;
+
+    // Check restrictions
+    const isBasicRestricted = existingPlanCount > basicLimit;
+    const isStandardRestricted = existingPlanCount > standardLimit;
+
+    // Helper to get limit for selected plan
+    const getLimitWarning = (plan) => {
+        if (plan === 'Basic' && isBasicRestricted) return { restricted: true, limit: basicLimit };
+        if (plan === 'Standard' && isStandardRestricted) return { restricted: true, limit: standardLimit };
+        return { restricted: false };
+    };
+
     const handleRenew = async () => {
         if (!selectedPlan) return;
 
-        // Check for Standard Plan Violation
-        if (selectedPlan === 'Standard' && (showDowngradeModal ? currentChitCount > standardLimit : isStandardRestricted)) {
-            // Open management modal instead of payment
+        // Check for Plan Violation
+        const warning = getLimitWarning(selectedPlan);
+        if (warning.restricted) {
+            // Open management modal instead of payment if downgrading/restricted
             if (!showDowngradeModal) {
                 fetchChits();
                 setShowDowngradeModal(true);
@@ -85,7 +96,7 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
 
             // 2. Open Razorpay
             const options = {
-                key: keyId, // Use key from backend
+                key: keyId,
                 amount: order.amount,
                 currency: order.currency,
                 name: "AURUM",
@@ -113,7 +124,7 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                                 localStorage.setItem('user', JSON.stringify(updated));
                             }
                             setShowSuccess(true);
-                            setTimeout(() => onRenew(data.merchant), 3000); // Redirect after 3s
+                            setTimeout(() => onRenew(data.merchant), 3000);
                         }
                     } catch (err) {
                         setError('Payment verification failed');
@@ -125,14 +136,8 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                     email: user.email,
                     contact: user.phone
                 },
-                theme: {
-                    color: "#915200"
-                },
-                modal: {
-                    ondismiss: function () {
-                        setLoading(false);
-                    }
-                }
+                theme: { color: "#915200" },
+                modal: { ondismiss: () => setLoading(false) }
             };
 
             const rzp1 = new window.Razorpay(options);
@@ -155,13 +160,15 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                     <div className="spinner-border text-warning" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
-                    <p className="small text-muted mt-2">Redirecting to dashboard...</p>
                 </div>
             </div>
         );
     }
 
     if (showDowngradeModal) {
+        const warning = getLimitWarning(selectedPlan);
+        const limit = warning.limit || (selectedPlan === 'Basic' ? basicLimit : standardLimit);
+
         return (
             <div className="d-flex align-items-center justify-content-center bg-light min-vh-100 py-4">
                 <div className="container" style={{ maxWidth: '700px' }}>
@@ -169,18 +176,17 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                         <div className="card-header bg-white border-0 pt-4 px-4">
                             <h4 className="fw-bold text-danger mb-0"><i className="fas fa-exclamation-triangle me-2"></i>Action Required</h4>
                             <p className="text-muted mt-2">
-                                You have selected the <strong>Standard Plan</strong> (Max 3 Chits), but you currently have <strong>{myChits.length}</strong> active chit plans.
+                                You have selected the <strong>{selectedPlan} Plan</strong> (Max {limit} Chits), but you currently have <strong>{myChits.length}</strong> active chit plans.
                             </p>
                         </div>
                         <div className="card-body px-4">
                             <div className="alert alert-warning border-0 d-flex align-items-center">
                                 <i className="fas fa-info-circle me-3 fa-2x"></i>
                                 <div>
-                                    Please delete <strong>{myChits.length - standardLimit}</strong> plan(s) to continue with the Standard renewal.
-                                    Or switch to Premium to keep all plans.
+                                    Please delete <strong>{myChits.length - limit}</strong> plan(s) to continue with this plan.
+                                    Or switch to a higher plan.
                                 </div>
                             </div>
-
                             {loadingChits ? (
                                 <div className="text-center py-5"><div className="spinner-border text-secondary"></div></div>
                             ) : (
@@ -191,14 +197,7 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                                                 <h6 className="mb-0 fw-bold text-dark">{chit.planName}</h6>
                                                 <small className="text-muted">₹{chit.totalAmount} • {chit.durationMonths} Months</small>
                                             </div>
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                className="rounded-pill px-3"
-                                                onClick={() => handleDeleteChit(chit._id)}
-                                            >
-                                                Delete
-                                            </Button>
+                                            <Button variant="outline-danger" size="sm" className="rounded-pill px-3" onClick={() => handleDeleteChit(chit._id)}>Delete</Button>
                                         </div>
                                     ))}
                                 </div>
@@ -209,12 +208,12 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                                 &larr; Back to Plans
                             </Button>
                             <Button
-                                variant={currentChitCount <= standardLimit ? "success" : "secondary"}
+                                variant={currentChitCount <= limit ? "success" : "secondary"}
                                 className="px-4 rounded-pill fw-bold"
-                                disabled={currentChitCount > standardLimit}
+                                disabled={currentChitCount > limit}
                                 onClick={handleRenew}
                             >
-                                {currentChitCount <= standardLimit ? 'Proceed with Payment' : `Delete ${currentChitCount - standardLimit} More`}
+                                {currentChitCount <= limit ? 'Proceed with Payment' : `Delete ${currentChitCount - limit} More`}
                             </Button>
                         </div>
                     </div>
@@ -223,68 +222,78 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
         );
     }
 
-    // Main Selection UI
     return (
         <div className="d-flex align-items-center justify-content-center bg-light h-100 py-4">
-            <div className="container" style={{ maxWidth: '800px' }}>
+            <div className="container" style={{ maxWidth: '1000px' }}>
                 <div className="card shadow-lg border-0 rounded-4 overflow-hidden">
                     <div className="card-header text-white text-center py-4" style={{ background: 'linear-gradient(135deg, #915200 0%, #d4af37 100%)' }}>
                         <h2 className="mb-0 fw-bold">
                             <i className={`fas ${isExpired ? 'fa-history' : 'fa-clock'} me-2`}></i>
                             {isExpired ? 'Subscription Expired' : 'Renew Subscription'}
                         </h2>
-
-                        <div className="mt-3 d-inline-flex bg-white bg-opacity-25 px-4 py-2 rounded-4 text-start align-items-center">
-                            <div className="pe-3 border-end border-white border-opacity-50">
-                                <small className="d-block opacity-75 text-uppercase fw-bold" style={{ fontSize: '0.7rem' }}>Current Plan</small>
-                                <div className="fw-bold fs-5">{user.plan || 'Standard'}</div>
-                            </div>
-                            <div className="ps-3">
-                                <small className="d-block opacity-75 text-uppercase fw-bold" style={{ fontSize: '0.7rem' }}>Status</small>
-                                <div className="fw-bold fs-5">
-                                    {isExpired
-                                        ? `Expired on ${expiryDate.toLocaleDateString()}`
-                                        : `${diffDays} Days Remaining`
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                        <div className="mt-2 text-white-50">Choose a plan that fits your business needs</div>
                     </div>
-                    <div className="card-body p-5">
+                    <div className="card-body p-4 p-lg-5">
                         {error && <Alert variant="danger">{error}</Alert>}
 
                         <h5 className="text-center mb-4 text-secondary">
-                            You have used <strong>{existingPlanCount}</strong> chit slots.
-                            {/* Warning derived from dynamic logic now */}
+                            You currently have <strong>{existingPlanCount}</strong> active chit slots.
                         </h5>
 
-                        <Row className="g-4 mb-4 justify-content-center">
-                            {/* Standard Plan */}
-                            <Col md={6}>
+                        <Row className="g-3 justify-content-center">
+                            {/* Basic Plan */}
+                            <Col md={4}>
                                 <div
-                                    className={`card h-100 cursor-pointer transition-all ${selectedPlan === 'Standard' ? 'border-primary ring-2' : ''} ${selectedPlan !== 'Standard' ? 'hover-shadow' : ''}`}
+                                    className={`card h-100 cursor-pointer transition-all ${selectedPlan === 'Basic' ? 'border-primary ring-2' : ''}`}
+                                    onClick={() => setSelectedPlan('Basic')}
+                                    style={{
+                                        border: selectedPlan === 'Basic' ? '2px solid #915200' : '1px solid #e0e0e0',
+                                        backgroundColor: selectedPlan === 'Basic' ? '#fffaf0' : '#fff'
+                                    }}
+                                >
+                                    <div className="card-body text-center p-3">
+                                        <h5 className="fw-bold text-dark">Basic</h5>
+                                        <h4 className="my-2 text-secondary fw-bold">₹1500<span className="fs-6 fw-normal">/mo + 18% GST</span></h4>
+                                        <div className="text-muted small mb-3">₹15,000/yr + 18% GST</div>
+                                        <hr className="my-3" />
+                                        <ul className="list-unstyled text-start small text-muted mx-auto mb-3" style={{ maxWidth: '200px' }}>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>3 Chits Only</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Email Support</li>
+                                            <li className="mb-2 text-decoration-line-through"><i className="fas fa-times text-muted me-2"></i>Shop Images</li>
+                                        </ul>
+                                        {isBasicRestricted && (
+                                            <div className="text-warning small mt-2 fw-bold bg-warning bg-opacity-10 p-2 rounded">
+                                                <i className="fas fa-exclamation-triangle me-1"></i> Limit Exceeded
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </Col>
+
+                            {/* Standard Plan */}
+                            <Col md={4}>
+                                <div
+                                    className={`card h-100 cursor-pointer transition-all ${selectedPlan === 'Standard' ? 'border-primary ring-2' : ''}`}
                                     onClick={() => setSelectedPlan('Standard')}
                                     style={{
-                                        cursor: 'pointer',
                                         border: selectedPlan === 'Standard' ? '2px solid #915200' : '1px solid #e0e0e0',
                                         backgroundColor: selectedPlan === 'Standard' ? '#fffaf0' : '#fff'
                                     }}
                                 >
-                                    <div className="card-body text-center p-4">
-                                        <h5 className="fw-bold text-dark">Standard Plan</h5>
-                                        <h4 className="my-3 text-secondary fw-bold">1500/mon</h4>
-                                        <ul className="list-unstyled text-start small text-muted mx-auto" style={{ maxWidth: '200px' }}>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>3 Chits Only</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Normal Dashboard</li>
-                                            <li className="mb-2"><i className="fas fa-times text-danger me-2"></i>No Shop Image Uploads</li>
-                                            <li className="mb-2"><i className="fas fa-exclamation-triangle text-warning me-2"></i>Screen Blocking Ads</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Email Support</li>
+                                    <div className="card-body text-center p-3">
+                                        <div className="mb-2"><span className="badge bg-secondary">Most Popular</span></div>
+                                        <h5 className="fw-bold text-dark">Standard</h5>
+                                        <h4 className="my-2 text-primary fw-bold" style={{ color: '#915200' }}>₹2500<span className="fs-6 fw-normal">/mo + 18% GST</span></h4>
+                                        <div className="text-muted small mb-3">₹25,000/yr + 18% GST</div>
+                                        <hr className="my-3" />
+                                        <ul className="list-unstyled text-start small text-muted mx-auto mb-3" style={{ maxWidth: '200px' }}>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Up to 6 Chits</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Advanced Dashboard</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Unlimited Shop Images</li>
                                         </ul>
-                                        {/* Show warning if checking would trigger downgrade flow */}
                                         {isStandardRestricted && (
-                                            <div className="text-warning small mt-2 fw-bold">
-                                                <i className="fas fa-exclamation-triangle me-1"></i>
-                                                Requires deleting plans
+                                            <div className="text-warning small mt-2 fw-bold bg-warning bg-opacity-10 p-2 rounded">
+                                                <i className="fas fa-exclamation-triangle me-1"></i> Limit Exceeded
                                             </div>
                                         )}
                                     </div>
@@ -292,35 +301,33 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
                             </Col>
 
                             {/* Premium Plan */}
-                            <Col md={6}>
+                            <Col md={4}>
                                 <div
-                                    className={`card h-100 cursor-pointer transition-all ${selectedPlan === 'Premium' ? 'border-primary ring-2' : 'hover-shadow'}`}
+                                    className={`card h-100 cursor-pointer transition-all ${selectedPlan === 'Premium' ? 'border-primary ring-2' : ''}`}
                                     onClick={() => setSelectedPlan('Premium')}
                                     style={{
-                                        cursor: 'pointer',
                                         border: selectedPlan === 'Premium' ? '2px solid #915200' : '1px solid #e0e0e0',
                                         backgroundColor: selectedPlan === 'Premium' ? '#fffaf0' : '#fff'
                                     }}
                                 >
-                                    <div className="card-body text-center p-4">
-                                        <div className="position-absolute top-0 end-0 m-2">
-                                            <span className="badge bg-warning text-dark">Recommended</span>
-                                        </div>
-                                        <h5 className="fw-bold text-dark">Premium Plan</h5>
-                                        <h4 className="my-3 text-warning fw-bold">5000/mon</h4>
-                                        <ul className="list-unstyled text-start small text-muted mx-auto" style={{ maxWidth: '200px' }}>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Up to 6 Chits</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Advanced Dashboard</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Unlimited Shop Images</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>No Screen Blocking Ads</li>
-                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>24/7 Support</li>
+                                    <div className="card-body text-center p-3">
+                                        <div className="mb-2"><span className="badge bg-warning text-dark">Best Value</span></div>
+                                        <h5 className="fw-bold text-dark">Premium</h5>
+                                        <h4 className="my-2 text-warning fw-bold">₹3500<span className="fs-6 fw-normal">/mo + 18% GST</span></h4>
+                                        <div className="text-muted small mb-3">₹35,000/yr + 18% GST</div>
+                                        <hr className="my-3" />
+                                        <ul className="list-unstyled text-start small text-muted mx-auto mb-3" style={{ maxWidth: '200px' }}>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>iOS App Access</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>9 Chit Plan</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Custom Ads</li>
+                                            <li className="mb-2"><i className="fas fa-check text-success me-2"></i>Priority Support</li>
                                         </ul>
                                     </div>
                                 </div>
                             </Col>
                         </Row>
 
-                        <div className="text-center">
+                        <div className="text-center mt-4">
                             <Button
                                 size="lg"
                                 className="px-5 rounded-pill fw-bold"

@@ -63,8 +63,9 @@ const Subscribers = () => {
                 const revenue = data
                     .filter(m => m.status === 'Approved')
                     .reduce((acc, m) => {
-                        if (m.plan === 'Premium') return acc + 5000;
-                        if (m.plan === 'Standard') return acc + 1500;
+                        if (m.plan === 'Premium') return acc + 3500;
+                        if (m.plan === 'Standard') return acc + 2500;
+                        if (m.plan === 'Basic') return acc + 1500;
                         return acc;
                     }, 0);
 
@@ -102,7 +103,10 @@ const Subscribers = () => {
         const monthIndex = date.getMonth(); // 0 = Jan, 11 = Dec
         // Only consider current year or simplified all-time monthly aggregation
         // For simplicity: Aggregating all time revenue into months
-        const amount = m.plan === 'Premium' ? 5000 : 1500;
+        let amount = 0;
+        if (m.plan === 'Premium') amount = 3500;
+        else if (m.plan === 'Standard') amount = 2500;
+        else amount = 1500; // Basic or fallback
         monthlyRevenue[monthIndex] += amount;
     });
 
@@ -138,12 +142,12 @@ const Subscribers = () => {
 
     // 2. Plan Distribution Doughnut Data
     const distributionData = {
-        labels: ['Premium', 'Standard'],
+        labels: ['Premium', 'Standard', 'Basic'],
         datasets: [
             {
-                data: [stats.premiumCount, stats.standardCount],
-                backgroundColor: [brandViolet, brandDarkBlue],
-                borderColor: ['#fff', '#fff'],
+                data: [stats.premiumCount, stats.standardCount, stats.total - (stats.premiumCount + stats.standardCount)],
+                backgroundColor: [brandViolet, brandDarkBlue, '#f3e9bd'],
+                borderColor: ['#fff', '#fff', '#fff'],
                 borderWidth: 2,
             },
         ],
@@ -185,7 +189,7 @@ const Subscribers = () => {
 
     return (
         <div className="animate__animated animate__fadeIn">
-            <h5 style={{color:"#915200"}} className="mb-4 d-flex align-items-center fw-semibold justify-content-between">
+            <h5 style={{ color: "#915200" }} className="mb-4 d-flex align-items-center fw-semibold justify-content-between">
                 <span><i className="fas fa-chart-pie me-2"></i>Subscription Analytics</span>
                 {/* <Badge bg="light" text="dark" className="fw-normal border">
                     <i className="fas fa-calendar-alt me-2 text-muted"></i> This Month

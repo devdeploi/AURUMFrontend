@@ -51,9 +51,9 @@ const LandingPage = () => {
 
     const plans = [
         {
-            name: 'Standard',
-            price: billingCycle === 'yearly' ? '₹15,000' : '₹1500',
-            period: billingCycle === 'yearly' ? '/yr' : '/mo',
+            name: 'Basic',
+            price: billingCycle === 'yearly' ? '₹15,000' : '₹1,500',
+            period: billingCycle === 'yearly' ? '/yr + 18% GST' : '/mo + 18% GST',
             features: [
                 '3 Chits Only',
                 'Normal Dashboard',
@@ -65,9 +65,9 @@ const LandingPage = () => {
             savings: billingCycle === 'yearly' ? 'Save ₹3,000/yr' : ''
         },
         {
-            name: 'Premium',
+            name: 'Standard',
             price: billingCycle === 'yearly' ? '₹25,000' : '₹2,500',
-            period: billingCycle === 'yearly' ? '/yr' : '/mo',
+            period: billingCycle === 'yearly' ? '/yr + 18% GST' : '/mo + 18% GST',
             features: [
                 'Up to 6 Chits',
                 'Advanced Dashboard',
@@ -75,8 +75,22 @@ const LandingPage = () => {
                 'No Screen Blocking Ads',
                 '24/7 Support'
             ],
-            recommended: true,
+            recommended: false,
             savings: billingCycle === 'yearly' ? 'Save ₹5,000/yr' : ''
+        },
+        {
+            name: 'Premium',
+            price: billingCycle === 'yearly' ? '₹35,000' : '₹3,500',
+            period: billingCycle === 'yearly' ? '/yr + 18% GST' : '/mo + 18% GST',
+            features: [
+                'iOS App Access',
+                '9 Chit Plan',
+                'Custom Ads',
+                'Payment Filter (Date)',
+                'Priority Support'
+            ],
+            recommended: true,
+            savings: billingCycle === 'yearly' ? 'Save ₹7,000/yr' : ''
         }
     ];
 
@@ -974,7 +988,7 @@ const LandingPage = () => {
                                                     background: plan.recommended ? `linear-gradient(135deg, ${brandColor}15, ${goldColor}15)` : '#f8f9fa',
                                                     color: brandColor
                                                 }}>
-                                                <i className={`fas ${plan.recommended ? 'fa-crown' : 'fa-cube'} fs-4`}></i>
+                                                <i className={`fas ${plan.name === 'Premium' ? 'fa-crown' : plan.name === 'Standard' ? 'fa-cube' : 'fa-leaf'} fs-4`}></i>
                                             </div>
                                             <h4 className="fw-bold mb-2">{plan.name}</h4>
                                             <div className="d-flex align-items-center justify-content-center flex-column">

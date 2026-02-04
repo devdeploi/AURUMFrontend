@@ -84,7 +84,8 @@ const ManageChits = () => {
             durationMonths: parseInt(formData.get('duration')),
             description: formData.get('description'),
             merchant: merchantId, // Ensure merchant ID is sent for new plans
-            totalAmount: parseFloat(formData.get('amount')) // Add totalAmount to planData
+            totalAmount: parseFloat(formData.get('amount')), // Add totalAmount to planData
+            returnType: formData.get('returnType') // Add returnType
         };
 
         // Basic Validation
@@ -143,19 +144,24 @@ const ManageChits = () => {
     // State for form calculation
     const [amount, setAmount] = useState('');
     const [duration, setDuration] = useState(11);
+    const [returnType, setReturnType] = useState('Cash'); // Add state for return type
 
     const openModal = (chit = null) => {
         setCurrentChit(chit);
         // Initialize form state
         setAmount(chit ? chit.totalAmount : '');
         setDuration(chit ? chit.durationMonths : 11);
+        setReturnType(chit ? (chit.returnType || 'Cash') : 'Cash'); // Initialize returnType
         setShowModal(true);
     };
 
     // Plan Limits & KYC Logic
     const userPlan = merchantData?.plan || loggedinuser?.plan || 'Standard';
     const isPremium = userPlan === 'Premium';
-    const planLimit = isPremium ? 6 : 3;
+
+    let planLimit = 3;
+    if (userPlan === 'Standard') planLimit = 6;
+    if (userPlan === 'Premium') planLimit = 9;
     const currentCount = myChits.length;
 
     // Check KYC
@@ -180,7 +186,7 @@ const ManageChits = () => {
         setShowUpgradeModal(false); // Close modal before starting payment logic
         try {
             // 1. Create Order
-            const amount = upgradeCycle === 'yearly' ? 50000 : 5000;
+            const amount = upgradeCycle === 'yearly' ? 41300 : 4130;  // 35000 + 18% GST (6300) = 41300
             const { data: order } = await axios.post(`${APIURL}/payments/create-subscription-order`, {
                 amount: amount
             });
@@ -317,7 +323,7 @@ const ManageChits = () => {
                             overlay={<Tooltip>
                                 {!isKycVerified
                                     ? "KYC Pending! Please verify Bank details and update PAN info (Legal Name & PAN Number) in Profile to create plans."
-                                    : (isPremium ? "Limit Reached! Maximum 6 plans allowed." : "Limit Reached! Upgrade to Premium to add more plans.")}
+                                    : (isPremium ? `Limit Reached! Maximum ${planLimit} plans allowed.` : "Limit Reached! Upgrade to Premium to add more plans.")}
                             </Tooltip>}
                         >
                             <span className="d-inline-block">
@@ -425,6 +431,7 @@ const ManageChits = () => {
                                 {/* <th>Type</th> Type is not in DB model yet */}
                                 <th>Monthly / Total</th>
                                 <th>Duration</th>
+                                <th>Return Type</th>
                                 <th>Description</th>
                                 <th>Actions</th>
                             </tr>
@@ -441,6 +448,7 @@ const ManageChits = () => {
                                         </div>
                                     </td>
                                     <td>{chit.durationMonths} Months</td>
+                                    <td><span className={`badge ${chit.returnType === 'Gold' ? 'bg-warning text-dark' : 'bg-success text-white'}`}>{chit.returnType || 'Cash'}</span></td>
                                     <td className="text-muted small text-truncate" style={{ maxWidth: '200px' }}>{chit.description}</td>
                                     <td>
                                         <Button variant="link" className="p-0 me-3" style={{ color: '#915200' }} onClick={() => openModal(chit)}>
@@ -499,6 +507,31 @@ const ManageChits = () => {
                             />
                             <div className="text-center fw-bold" style={{ color: '#915200' }}>{duration} Months</div>
                         </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{ color: '#915200' }} className="d-block mb-2">Return Type</Form.Label>
+                            <div className="d-flex gap-4">
+                                <Form.Check
+                                    type="radio"
+                                    id="returnType-cash"
+                                    name="returnType"
+                                    value="Cash"
+                                    label="Cash"
+                                    checked={returnType === 'Cash'}
+                                    onChange={(e) => setReturnType(e.target.value)}
+                                    className="fw-bold text-secondary"
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    id="returnType-gold"
+                                    name="returnType"
+                                    value="Gold"
+                                    label="Gold"
+                                    checked={returnType === 'Gold'}
+                                    onChange={(e) => setReturnType(e.target.value)}
+                                    className="fw-bold text-warning"
+                                />
+                            </div>
+                        </Form.Group>
                         <Form.Group className="mb-4">
                             <Form.Label style={{ color: '#915200' }}>Description / Benefits</Form.Label>
                             <Form.Control as="textarea" rows={3} name="description" defaultValue={currentChit?.description} placeholder="Describe the benefits..." />
@@ -519,8 +552,14 @@ const ManageChits = () => {
                 <Modal.Body className="text-center p-4">
                     <div className="mb-3">
                         <img src="/images/AURUM.png" alt="Logo" className="mb-3" style={{ height: '60px' }} />
-                        <h4 className="fw-bold">Unlock Unlimited Possibilities</h4>
-                        <p className="text-muted">Upgrade to the Premium plan to create unlimited chit plans and grow your business without limits.</p>
+                        <h4 className="fw-bold">Premium Benefits</h4>
+                        <ul className="list-unstyled text-start mx-auto mt-3" style={{ maxWidth: '300px' }}>
+                            <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>iOS App Access</li>
+                            <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>9 Chit Plan</li>
+                            <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Custom Ads</li>
+                            <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Payment Filter (Date)</li>
+                            <li className="mb-2"><i className="fas fa-check-circle text-success me-2"></i>Priority Support</li>
+                        </ul>
                         <hr />
                         <div className="d-flex justify-content-center gap-2 mb-3 mt-4">
                             <Button
@@ -537,12 +576,12 @@ const ManageChits = () => {
                                 className="fw-bold rounded-pill"
                                 onClick={() => setUpgradeCycle('yearly')}
                             >
-                                Yearly (Save ₹10,000)
+                                Yearly (Save ₹7,000)
                             </Button>
                         </div>
                         <div className="display-6 fw-bold text-success">
-                            {upgradeCycle === 'yearly' ? '₹50,000' : '₹5,000'}
-                            <span className="fs-6 text-muted">/{upgradeCycle === 'yearly' ? 'year' : 'month'}</span>
+                            {upgradeCycle === 'yearly' ? '₹41,300' : '₹4,130'}
+                            <span className="fs-6 text-muted">/{upgradeCycle === 'yearly' ? 'year' : 'month'} <span className="text-danger small">(Incl. 18% GST)</span></span>
                         </div>
                     </div>
                 </Modal.Body>

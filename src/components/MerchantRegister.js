@@ -1435,7 +1435,16 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
                                 </small>
                             </div>
 
-                            {/* Mandatory Requirement Alert Removed */}
+                            {/* Mandatory Requirement Alert */}
+                            <div className="alert alert-danger border-danger d-flex align-items-start gap-2 p-3 mb-3 rounded-3" role="alert" style={{ backgroundColor: '#f8d7da', color: '#842029' }}>
+                                <i className="fas fa-exclamation-triangle mt-1" style={{ color: '#842029' }}></i>
+                                <div>
+                                    <h6 className="fw-bold mb-1" style={{ color: '#842029', fontSize: '0.9rem' }}>Mandatory Requirement</h6>
+                                    <p className="mb-0 lh-sm" style={{ fontSize: '0.85rem', color: '#842029' }}>
+                                        You <strong>must</strong> possess a valid <strong>Razorpay Merchant Account</strong>. After registration, you will be required to add your <strong>Razorpay Key ID & Secret</strong> in your profile settings to receive payments from subscribers.
+                                    </p>
+                                </div>
+                            </div>
 
                             <Button
                                 onClick={handlePaymentAndRegister}

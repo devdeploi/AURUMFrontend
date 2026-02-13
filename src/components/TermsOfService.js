@@ -179,9 +179,9 @@ const TermsOfService = () => {
                                     content: "Merchants are granted a non-exclusive, non-transferable license to use the platform for managing their chit schemes and customer data. Unlawful use of the platform is strictly prohibited."
                                 },
                                 {
-                                    title: "3. Subscription & Payments",
-                                    content: "Subscriptions are billed monthly. All payments processed via our secure payment gateway are final and non-refundable. Failure to pay may result in temporary suspension of services.",
-                                    warning: "Important: It is mandatory to maintain a valid subscription to access merchant services."
+                                    title: "3. Payments & Merchant Obligations",
+                                    content: "Subscriptions are billed monthly. To process payments from subscribers, Merchants are REQUIRED to maintain a valid Razorpay Merchant account and integrate their active Razorpay API Key ID and Secret within their profile settings immediately upon registration.",
+                                    warning: "Mandatory: A valid Razorpay integration is required to receive payments. AURUM is not liable for payment failures due to missing or invalid merchant credentials."
                                 },
                                 {
                                     title: "4. Data Responsibility",

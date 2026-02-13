@@ -104,6 +104,10 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
     const [searchingDate, setSearchingDate] = useState(false);
     const [showDateSearch, setShowDateSearch] = useState(false);
 
+    // Delivery Modal State
+    const [deliveryModal, setDeliveryModal] = useState({ show: false, subscriber: null, notes: '' });
+    const [submittingDelivery, setSubmittingDelivery] = useState(false);
+
     const handleDateSearch = async () => {
         if (!searchDate) return;
         setSearchingDate(true);
@@ -723,6 +727,25 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
             ]);
         }
 
+        // --- Add Gold Delivery Details if Delivered ---
+        if (subscriber.subscription.status === 'delivered_gold') {
+            // Add a visual separator or header for gold delivery
+            tableRows.push([
+                { content: "GOLD DELIVERY DETAILS", colSpan: 4, styles: { fontStyle: 'bold', fillColor: [212, 175, 55], textColor: [255, 255, 255], halign: 'center' } }
+            ]);
+
+            const details = subscriber.subscription.deliveryDetails || {};
+            const deliveredDate = details.deliveredDate ? new Date(details.deliveredDate).toLocaleDateString() : new Date().toLocaleDateString();
+            const deliveryNotes = details.notes || 'Gold Delivered';
+
+            tableRows.push([
+                deliveredDate,
+                `Delivered: Gold\nNotes: ${deliveryNotes}`,
+                "DELIVERY",
+                "COMPLETED"
+            ]);
+        }
+
         autoTable(doc, {
             startY: infoY + 35,
             head: [tableColumn],
@@ -846,6 +869,43 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
             // Do not close modal on error so user can retry
         } finally {
             setSubmittingManual(false);
+        }
+    };
+
+    const openDeliveryModal = (subscriber) => {
+        setDeliveryModal({ show: true, subscriber, notes: '' });
+    };
+
+    const submitDelivery = async () => {
+        if (!deliveryModal.subscriber) return;
+        setSubmittingDelivery(true);
+        try {
+            const config = { headers: { Authorization: `Bearer ${user.token}` } };
+            const planId = deliveryModal.subscriber.plan._id;
+            const userId = deliveryModal.subscriber.user._id;
+
+            await axios.post(`${APIURL}/chit-plans/${planId}/deliver`, {
+                userId,
+                notes: deliveryModal.notes
+            }, config);
+
+            setDeliveryModal({ show: false, subscriber: null, notes: '' });
+
+            // Show success
+            setSuccessModal({
+                show: true,
+                title: 'Gold Delivered!',
+                message: `You have successfully marked the gold plan as delivered for ${deliveryModal.subscriber.user.name}.`,
+                payment: null, // No invoice for delivery for now, or maybe generate one
+                subscriber: deliveryModal.subscriber
+            });
+
+            fetchSubscribers();
+        } catch (error) {
+            console.error("Delivery update failed", error);
+            alert("Failed to update status.");
+        } finally {
+            setSubmittingDelivery(false);
         }
     };
 
@@ -1301,13 +1361,14 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                                         </td>
                                         <td className="pe-4">
                                             <Badge bg={
-                                                item.subscription.status === 'active' ? 'primary' :
-                                                    item.subscription.status === 'completed' ? 'success' :
-                                                        item.subscription.status === 'settled' ? 'success' :
-                                                            item.subscription.status === 'requested_withdrawal' ? 'warning' :
-                                                                'secondary'
-                                            } className="px-2 py-1">
-                                                {item.subscription.status ? item.subscription.status.toUpperCase() : 'ACTIVE'}
+                                                item.subscription.status === 'delivered_gold' ? 'warning' :
+                                                    item.subscription.status === 'active' ? 'primary' :
+                                                        item.subscription.status === 'completed' ? 'success' :
+                                                            item.subscription.status === 'settled' ? 'success' :
+                                                                item.subscription.status === 'requested_withdrawal' ? 'warning' :
+                                                                    'secondary'
+                                            } className="px-2 py-1" style={item.subscription.status === 'delivered_gold' ? { backgroundColor: '#ffd700', color: '#000' } : {}}>
+                                                {item.subscription.status === 'delivered_gold' ? 'DELIVERED GOLD' : (item.subscription.status ? item.subscription.status.toUpperCase() : 'ACTIVE')}
                                             </Badge>
                                         </td>
                                         <td>
@@ -1333,32 +1394,49 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                                                     <i className="fas fa-history"></i>
                                                 </Button>
 
-                                                <Button
-                                                    size="sm"
-                                                    disabled={remainingBalance <= 0}
-                                                    onClick={() => openManualPaymentModal(item)}
-                                                    title="Paid Offline"
-                                                    style={{
-                                                        border: '1px solid #915200',
-                                                        color: remainingBalance <= 0 ? '#ccc' : '#915200',
-                                                        backgroundColor: 'transparent',
-                                                        opacity: remainingBalance <= 0 ? 0.5 : 1
-                                                    }}
-                                                    onMouseOver={(e) => {
-                                                        if (remainingBalance > 0) {
-                                                            e.currentTarget.style.backgroundColor = '#915200';
-                                                            e.currentTarget.style.color = '#fff';
-                                                        }
-                                                    }}
-                                                    onMouseOut={(e) => {
-                                                        if (remainingBalance > 0) {
-                                                            e.currentTarget.style.backgroundColor = 'transparent';
-                                                            e.currentTarget.style.color = '#915200';
-                                                        }
-                                                    }}
-                                                >
-                                                    <i className="fas fa-hand-holding-usd"></i>
-                                                </Button>
+                                                {(item.subscription.status === 'completed' && item.plan.returnType?.toLowerCase() === 'gold') ? (
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => openDeliveryModal(item)}
+                                                        title="Deliver Gold"
+                                                        className="slide-in-right"
+                                                        style={{
+                                                            border: '1px solid #cca300',
+                                                            color: '#fff',
+                                                            backgroundColor: '#ffd700',
+                                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-gift"></i>
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        disabled={remainingBalance <= 0}
+                                                        onClick={() => openManualPaymentModal(item)}
+                                                        title="Paid Offline"
+                                                        style={{
+                                                            border: '1px solid #915200',
+                                                            color: remainingBalance <= 0 ? '#ccc' : '#915200',
+                                                            backgroundColor: 'transparent',
+                                                            opacity: remainingBalance <= 0 ? 0.5 : 1
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            if (remainingBalance > 0) {
+                                                                e.currentTarget.style.backgroundColor = '#915200';
+                                                                e.currentTarget.style.color = '#fff';
+                                                            }
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            if (remainingBalance > 0) {
+                                                                e.currentTarget.style.backgroundColor = 'transparent';
+                                                                e.currentTarget.style.color = '#915200';
+                                                            }
+                                                        }}
+                                                    >
+                                                        <i className="fas fa-hand-holding-usd"></i>
+                                                    </Button>
+                                                )}
                                             </div>
                                         </td>
 
@@ -1782,6 +1860,51 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                 </Modal.Body>
             </Modal>
 
+            {/* Delivery Confirmation Modal */}
+            <Modal show={deliveryModal.show} onHide={() => setDeliveryModal({ ...deliveryModal, show: false })} centered>
+                <Modal.Header closeButton style={{ backgroundColor: '#fffbf0', borderBottom: '2px solid #f3e9bd' }}>
+                    <Modal.Title style={{ color: '#915200' }}>
+                        <i className="fas fa-gift me-2"></i> Confirm Gold Delivery
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    {deliveryModal.subscriber && (
+                        <>
+                            <div className="alert alert-warning border-0 d-flex align-items-center mb-4" style={{ backgroundColor: '#fff9db', color: '#856404' }}>
+                                <i className="fas fa-info-circle fa-2x me-3"></i>
+                                <div>
+                                    <strong>Mark as Delivered?</strong>
+                                    <div className="small">This action will update the status to 'Delivered Gold'. Ensure the customer has received the gold.</div>
+                                </div>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label fw-bold text-secondary">Delivery Notes</label>
+                                <textarea
+                                    className="form-control"
+                                    rows="3"
+                                    placeholder="E.g. Delivered 10g Gold Chain..."
+                                    value={deliveryModal.notes}
+                                    onChange={(e) => setDeliveryModal({ ...deliveryModal, notes: e.target.value })}
+                                ></textarea>
+                            </div>
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="border-0 bg-light">
+                    <Button variant="outline-secondary" onClick={() => setDeliveryModal({ ...deliveryModal, show: false })}>
+                        Cancel
+                    </Button>
+                    <Button
+                        style={{ backgroundColor: '#915200', borderColor: '#915200' }}
+                        onClick={submitDelivery}
+                        disabled={submittingDelivery}
+                    >
+                        {submittingDelivery ? 'Processing...' : 'Confirm Delivery'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
             {/* History Details Modal */}
             <Modal show={showHistoryModal} onHide={() => setShowHistoryModal(false)} centered size="xl">
                 <Modal.Header closeButton style={{ borderBottom: '2px solid #f3e9bd' }}>
@@ -1851,7 +1974,7 @@ const MerchantSubscribers = ({ merchantId, user, showHeader = true }) => {
                                             </div>
                                             <div className="mt-3 text-center">
                                                 <Badge bg="light" className="px-3 py-2 rounded-pill border" style={{ color: '#915200', borderColor: '#915200' }}>
-                                                    {selectedSubscriber.subscription.status?.toUpperCase() || 'ACTIVE'}
+                                                    {selectedSubscriber.subscription.status === 'delivered_gold' ? 'DELIVERED GOLD' : (selectedSubscriber.subscription.status?.toUpperCase() || 'ACTIVE')}
                                                 </Badge>
                                             </div>
                                         </div>

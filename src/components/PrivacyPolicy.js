@@ -185,8 +185,8 @@ const PrivacyPolicy = () => {
                                     content: "We use your information to operate and improve our platform, process transactions, send notifications, and prevent fraud."
                                 },
                                 {
-                                    title: "3. Data Sharing",
-                                    content: "We do not sell your personal data. We may share information with third-party service providers (e.g., secure payment processors) solely for the purpose of providing our services."
+                                    title: "3. Payment Gateway & Data Sharing",
+                                    content: "We integrate with Razorpay for secure payment processing. Merchants are required to manage their own Razorpay Merchant accounts. We facilitate the integration of your Razorpay API keys to enable subscriber transactions but do not store your direct banking credentials."
                                 },
                                 {
                                     title: "4. Data Security",

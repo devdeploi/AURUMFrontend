@@ -201,11 +201,8 @@ const ManageChits = () => {
     const currentCount = myChits.length;
 
     const isKycVerified =
-        merchantData?.bankDetails?.accountNumber &&
-        merchantData?.bankDetails?.ifscCode &&
-        merchantData?.bankDetails?.accountHolderName &&
-        merchantData?.legalName &&
-        merchantData?.panNumber;
+        merchantData?.razorpayKeyId && merchantData?.panNumber &&
+        merchantData?.razorpayKeySecret && merchantData?.legalName;
 
     const canCreate = isKycVerified && (currentCount < planLimit);
 
@@ -367,7 +364,7 @@ const ManageChits = () => {
                             placement="left"
                             overlay={<Tooltip>
                                 {!isKycVerified
-                                    ? "KYC Pending! Please verify Bank details in Profile."
+                                    ? "Setup Incomplete! Please add Bank details and Razorpay Keys in Profile."
                                     : (isPremium ? `Limit Reached! Maximum ${planLimit} plans allowed.` : "Limit Reached! Upgrade to add more plans.")}
                             </Tooltip>}
                         >

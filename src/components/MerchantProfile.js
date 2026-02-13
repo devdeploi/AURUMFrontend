@@ -76,19 +76,7 @@ const MerchantProfile = ({ merchantData }) => {
         setData({ ...data, [e.target.name]: value });
     };
 
-    const handleBankChange = (e) => {
-        let value = e.target.value;
-        if (e.target.name === 'ifscCode') {
-            value = value.toUpperCase();
-        }
-        setData({
-            ...data,
-            bankDetails: {
-                ...data.bankDetails,
-                [e.target.name]: value
-            }
-        });
-    };
+
 
 
 
@@ -176,11 +164,7 @@ const MerchantProfile = ({ merchantData }) => {
 
 
 
-    const maskAccountNumber = (value = '') =>
-        value.length > 4 ? 'XXXXXX' + value.slice(-4) : value;
 
-    const maskIFSC = (value = '') =>
-        value ? 'XXXXXXXX' : '';
 
 
     const handleSave = async (e) => {
@@ -676,80 +660,41 @@ const MerchantProfile = ({ merchantData }) => {
                                 <div className="d-flex align-items-center my-3">
                                     <div style={{ height: '1px', flex: 1, backgroundColor: '#e2d183' }}></div>
                                     <span className="mx-3 small fw-bold uppercase" style={{ color: '#915200', letterSpacing: '1px' }}>
-                                        Bank Details (Payouts)
+                                        Payment Integration Keys (Razorpay)
                                     </span>
                                     <div style={{ height: '1px', flex: 1, backgroundColor: '#e2d183' }}></div>
                                 </div>
                             </Col>
-                            {/* Payout Details Section */}
+                            {/* Razorpay Keys Details Section */}
                             <Col md={12}>
                                 <Card className="border-0 bg-light p-3">
                                     <Row className="g-2">
-                                        <Col md={4}>
+                                        <Col md={6}>
                                             <Form.Group>
-                                                <Form.Label className="small fw-bold uppercase" style={{ color: '#915200' }}>Account Holder Name</Form.Label>
+                                                <Form.Label className="small fw-bold uppercase" style={{ color: '#915200' }}>Key ID</Form.Label>
                                                 <Form.Control
-                                                    name="accountHolderName" // Changed from accountName to accountHolderName to match schema
-                                                    value={data.bankDetails?.accountHolderName || ''}
-                                                    onChange={handleBankChange}
+                                                    name="razorpayKeyId"
+                                                    value={data.razorpayKeyId || ''}
+                                                    onChange={handleChange}
                                                     disabled={!isEditing}
-                                                    placeholder='Enter Account Holder Name'
-                                                    // size="sm"
+                                                    placeholder='Enter Razorpay Key ID'
                                                     className="fw-bold"
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        <Col md={3}>
+                                        <Col md={6}>
                                             <Form.Group>
-                                                <Form.Label
-                                                    className="small fw-bold text-uppercase"
-                                                    style={{ color: '#915200' }}
-                                                >
-                                                    Account Number
-                                                </Form.Label>
-
+                                                <Form.Label className="small fw-bold uppercase" style={{ color: '#915200' }}>Key Secret</Form.Label>
                                                 <Form.Control
-                                                    name="accountNumber"
-                                                    value={
-                                                        isEditing
-                                                            ? data.bankDetails?.accountNumber || ''
-                                                            : maskAccountNumber(data.bankDetails?.accountNumber)
-                                                    }
-                                                    onChange={(e) => {
-                                                        let value = e.target.value.replace(/\D/g, ''); // digits only
-
-                                                        handleBankChange({
-                                                            target: {
-                                                                name: 'accountNumber',
-                                                                value
-                                                            }
-                                                        });
-                                                    }}
+                                                    name="razorpayKeySecret"
+                                                    value={data.razorpayKeySecret || ''}
+                                                    onChange={handleChange}
                                                     disabled={!isEditing}
-                                                    inputMode="numeric"
-                                                    pattern="[0-9]*"
-                                                    placeholder="Enter account number"
+                                                    placeholder='Enter Razorpay Key Secret'
+                                                    type="password"
                                                     className="fw-bold"
                                                 />
                                             </Form.Group>
-                                        </Col>
-
-                                        <Col md={3}>
-                                            <Form.Group>
-                                                <Form.Label className="small fw-bold uppercase" style={{ color: '#915200' }}>IFSC Code</Form.Label>
-                                                <Form.Control
-                                                    name="ifscCode"
-                                                    value={isEditing ? data.bankDetails?.ifscCode || '' : maskIFSC(data.bankDetails?.ifscCode)}
-                                                    onChange={handleBankChange}
-                                                    disabled={!isEditing}
-                                                    placeholder='Enter IFSC code'
-                                                    // size="sm"
-                                                    className="fw-bold"
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={2} className="d-flex align-items-end">
-                                            {/* No verification needed */}
                                         </Col>
                                     </Row>
                                 </Card>

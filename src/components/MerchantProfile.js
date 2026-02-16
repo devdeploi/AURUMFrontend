@@ -233,7 +233,7 @@ const MerchantProfile = ({ merchantData }) => {
 
             // 2. Initialize Razorpay
             const options = {
-                key: process.env.RAZORPAY_KEY_ID, // Correct key matching backend
+                key: order.keyId || process.env.REACT_APP_RAZORPAY_KEY_ID, // Correct key matching backend
                 amount: order.amount,
                 currency: order.currency,
                 name: "Aurum Jewellery",
@@ -356,7 +356,7 @@ const MerchantProfile = ({ merchantData }) => {
             const user = JSON.parse(localStorage.getItem('user'));
 
             const options = {
-                key: order.keyId || process.env.RAZORPAY_KEY_ID, // keyId might come from create-renewal-order response
+                key: order.keyId || process.env.REACT_APP_RAZORPAY_KEY_ID, // keyId might come from create-renewal-order response
                 amount: order.order.amount,
                 currency: order.order.currency,
                 name: "Aurum Jewellery",

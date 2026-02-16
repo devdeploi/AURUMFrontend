@@ -96,7 +96,7 @@ const SubscriptionExpired = ({ user, onRenew, existingPlanCount }) => {
 
             // 2. Open Razorpay
             const options = {
-                key: keyId,
+                key: keyId || process.env.REACT_APP_RAZORPAY_KEY_ID,
                 amount: order.amount,
                 currency: order.currency,
                 name: "AURUM",

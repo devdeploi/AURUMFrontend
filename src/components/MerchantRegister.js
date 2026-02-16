@@ -364,7 +364,7 @@ const MerchantRegister = ({ onRegister, onSwitchToLogin }) => {
 
             // 2. Initialize Razorpay
             const options = {
-                key: process.env.RAZORPAY_KEY_ID,
+                key: order.keyId,
                 amount: order.amount,
                 currency: order.currency,
                 name: "Aurum Jewellery",
